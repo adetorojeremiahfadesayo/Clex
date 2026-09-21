@@ -4,7 +4,17 @@ Working name for a company-specific legal and compliance workspace for startups 
 
 The product learns the company's confirmed context, assesses its starting position, explains next steps, and supports employment, supplier/commercial, and other business matters as the company grows. Lawyer review is part of this continuing workflow, not the entire product.
 
-**Status: implementation plan only. No application, live legal guidance, or deployment exists in this repository yet.**
+**Status: M0 foundation scaffold (auth, tenant isolation, job queue, CI) is implemented and tested locally. No legal guidance, model integration, or production deployment exists yet. See [docs/STATUS.md](docs/STATUS.md).**
+
+## Local development
+
+```bash
+pnpm install
+source scripts/dev-env.sh   # starts local Postgres 16, creates lex_dev, applies migrations, exports *_DATABASE_URL
+pnpm dev                    # web on http://localhost:3000
+pnpm dev:worker             # durable job worker (separate terminal)
+PG_ADMIN_URL=postgres://postgres:postgres@localhost:5432/postgres pnpm test
+```
 
 ## Start here
 

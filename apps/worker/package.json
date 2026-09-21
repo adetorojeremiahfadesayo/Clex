@@ -1,0 +1,12 @@
+{
+  "name": "@lex/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": { "@lex/db": "workspace:*", "@lex/domain": "workspace:*", "pg": "8.23.0", "zod": "4.6.5" }
+}
