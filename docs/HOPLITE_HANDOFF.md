@@ -2,7 +2,7 @@
 
 ## What is ready
 
-This private repository contains a plan and build instructions. It has no runnable app, package.json, installed dependencies, application secrets or deployed services yet. The first Hoplite task must scaffold the application.
+This private repository contains the plan plus the M0 foundation scaffold (pnpm workspace, migrations, web, worker, tests, CI). `.hoplite/settings.json` defines the sandbox setup and run scripts. No application secrets or deployed services exist; see docs/STATUS.md for verified state.
 
 Official Hoplite material describes connecting GitHub repositories, running agents in isolated development environments and reviewing managed previews/diffs: https://www.usehoplite.com/ and https://www.usehoplite.com/about (checked September 21, 2026). Account access, subscription limits, exact settings screens and production hosting were not verified. Do not invent a Hoplite configuration file or API.
 
@@ -20,18 +20,18 @@ Official Hoplite material describes connecting GitHub repositories, running agen
 
 | Script | Contract |
 |---|---|
-| npm run dev | Start web bound to configured host/port |
-| npm run dev:worker | Start durable worker |
-| npm run lint | Static code checks |
-| npm run typecheck | Strict TypeScript validation |
-| npm test | Domain and integration tests; report skipped external-service tests |
-| npm run test:e2e | Playwright acceptance journeys against configured preview |
-| npm run build | Production compilation |
-| npm run db:migrate | Apply versioned SQL migrations to explicitly selected environment |
-| npm run seed:demo | Idempotently seed synthetic tenants only; refuse production |
-| npm run eval:legal | Evaluate reviewed cases, record denominator and unsupported claims |
+| pnpm dev | Start web bound to configured host/port |
+| pnpm dev:worker | Start durable worker |
+| pnpm lint | Static code checks |
+| pnpm typecheck | Strict TypeScript validation |
+| pnpm test | Domain and integration tests; report skipped external-service tests |
+| pnpm test:e2e | Playwright acceptance journeys against configured preview |
+| pnpm build | Production compilation |
+| pnpm db:migrate | Apply versioned SQL migrations to explicitly selected environment |
+| pnpm seed:demo | Idempotently seed synthetic tenants only; refuse production |
+| pnpm eval:legal | Evaluate reviewed cases, record denominator and unsupported claims |
 
-These commands are planned interfaces, not currently executable commands.
+Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` and `eval:legal` exit with an explicit not-implemented message.
 
 ## Paste-ready implementation prompt
 

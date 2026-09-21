@@ -1,0 +1,32 @@
+{
+  "name": "lex-company-counsel",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@10.26.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @lex/web dev",
+    "dev:worker": "pnpm --filter @lex/worker dev",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "build": "pnpm -r --if-present build",
+    "db:setup": "tsx packages/db/src/cli/setup.ts",
+    "db:migrate": "tsx packages/db/src/cli/migrate.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "eval:legal": "tsx scripts/eval-legal.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "@types/pg": "8.23.1",
+    "pg": "8.23.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

@@ -16,3 +16,9 @@ playwright-report/
 test-results/
 *.pem
 *.key
+
+# Hoplite sandbox runtime state (settings.json is committed)
+.hoplite/*
+!.hoplite/settings.json
+.context/
+*.tsbuildinfo
