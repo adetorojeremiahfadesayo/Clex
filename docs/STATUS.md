@@ -1,17 +1,17 @@
 # Implementation status
 
-Updated: 2026-09-21 (M0 foundation).
+Updated: 2026-09-21 (M1 company start).
 
 | Area | Status |
 |---|---|
 | Agreed product direction | Documented |
 | Implementation plan and Hoplite prompt | Prepared |
-| Application code | M0 implemented and tested locally (pnpm monorepo: `apps/web`, `apps/worker`, `packages/domain`, `packages/db`) |
+| Application code | M0 merged; M1 implemented and tested locally (adds `packages/content`, profile/checklist/overview pages, `/api/v1` profile, assessments, checklist and brief export) |
 | Database/auth/storage | Local PostgreSQL 16 with RLS, versioned SQL migrations, cookie sessions (scrypt password hashes). Supabase project and object storage not configured |
 | Live model integration | Not configured; `/api/ready` reports `no_model_configured`. No model calls exist yet |
-| Jurisdiction packs | Research pointers only; none reviewed or published |
-| Automated tests | 19 Vitest tests passing locally (isolation, job queue, migrations, env). Playwright E2E not yet written |
-| Browser verification | Sign-up → company → jobs → sign-out/in journey inspected on desktop (1440×900) and mobile (390×844) in the Hoplite preview |
+| Jurisdiction packs | Research pointers only (six official directory URLs, checked 2026-09-21). Checklist uses explicitly labelled **synthetic starter rules** (`synthetic-starter-0.1.0`); nothing reviewed or published |
+| Automated tests | 39 Vitest tests passing locally (isolation, job queue, migrations, env, adaptive intake, transitions, synthetic assessment, revisions/checklist persistence). Playwright E2E not yet written |
+| Browser verification | M0 journey plus profile intake → auto-regenerated checklist → transition with evidence → brief → sign-out/in persistence inspected on desktop (1440×900) and mobile (390×844) |
 | Hoplite repository connection | Connected; `.hoplite/settings.json` provides setup and run scripts |
 | Preview/production deployment | Hoplite preview only (dev server). Not deployed to production |
 
@@ -46,7 +46,7 @@ Commands and outcomes (tested locally; no live model, no production deployment):
 | `pnpm db:setup` | Creates database, applies `0001_foundation.sql`, assigns role passwords; idempotent |
 | `pnpm build` | Next.js production build succeeds; 16 dynamic routes |
 | `pnpm dev` + `pnpm dev:worker` | Web and worker run together via `scripts/sandbox-run.sh` |
-| `pnpm seed:demo`, `pnpm eval:legal` | Exit 1 with explicit "not implemented (planned M1/M2)" messages; nothing written |
+| `pnpm seed:demo`, `pnpm eval:legal` | Exit 1 with explicit "not implemented" messages at M0; `seed:demo` implemented in M1 |
 
 Acceptance coverage in this milestone:
 
@@ -63,3 +63,46 @@ Mode: `no_model_configured` (reported by `/api/ready`). No synthetic legal outpu
 Limitations: no Supabase Auth/Storage, no uploads, no matters, no profile revisions, no reviewer invites yet; CI workflow installed at `.github/workflows/ci.yml` by the repository owner; first run (lint, typecheck, 19 tests, db:setup, build) passed on PR #1; Playwright E2E suite not written; CI uses a local password for the Postgres service container only.
 
 Next task: M1 Company start (adaptive intake, profile revisions with provenance, assessment, checklist, official links, preparation export).
+
+### M1 Company start — 2026-09-21
+
+Environment: Hoplite sandbox (Modal), Node v24.19.0, pnpm 10.26.0, PostgreSQL 16.14 local. Branch `feat/m1-company-start` from `main` @ `22a52c9`.
+
+Implemented:
+
+- Adaptive intake (`packages/domain/src/intake.ts`): 22 fact keys in five groups; questions gate on earlier answers (registration details only when registered, market-specific subdivision prompt, worker locations only when people exist). Every question offers **Not sure** where a fact must never be guessed, and **Skip** where safe. Unknown/skipped are stored states, never treated as "no".
+- Profile revisions (`0002_company_start.sql`, `app.confirm_profile_revision`): immutable JSON snapshots, monotonic version, `previous_revision_id`, per-fact provenance (`user_confirmed` for all M1 writes), actor and timestamp; `companies.current_profile_revision_id` composite-FK to the same company. `PATCH /companies/:id/profile` honours `If-Match` (409 on mismatch). Snapshots are schema-validated on read.
+- Assessment (`packages/content/src/assess.ts`): deterministic, no model call, always `mode: synthetic_demo`, versioned `contentVersion`; returns confirmed/unknown/missing fact keys, per-rule yes/no/unknown decisions with fact references, and a coverage block (`packStatus: research_pointers`, capabilities limited to information collection + official links). No numeric score anywhere.
+- Checklist: items reconcile with each assessment (new → `suggested`, no-longer-applicable → `superseded`, completed items preserved). Transitions per plan §3A with role and evidence/reason requirements enforced in domain code and `expectedVersion` optimistic locking enforced by a DB trigger; `reviewer_verified` and `superseded` are terminal. Founders cannot verify (A13 groundwork).
+- Official links: six directory URLs from docs/JURISDICTION_PACKS.md shown per market on formation items, each labelled "official directory · research pointer, not reviewed content".
+- Preparation brief: `GET /companies/:id/exports/brief` renders printable HTML (facts with provenance, unknowns, unanswered, checklist with evidence, adviser questions, sources) marked **Unreviewed**, tied to revision version; audit event recorded.
+- `pnpm seed:demo` seeds two synthetic tenants via the RLS-bound connection (refuses production).
+
+Commands and outcomes (tested locally; no live model, no production deployment):
+
+| Command | Outcome |
+|---|---|
+| `pnpm typecheck` | 5/5 packages pass |
+| `pnpm lint` | 0 errors, 0 warnings |
+| `PG_ADMIN_URL=… pnpm test` | 7 files, 39/39 pass on a fresh database (both migrations applied) |
+| `pnpm db:migrate` | `0002_company_start.sql` applied to lex_dev; idempotent re-run |
+| `pnpm seed:demo` | Two synthetic companies (NG pre-registration, GB operating) seeded; idempotent |
+| `pnpm build` | Production build OK |
+| `pnpm eval:legal` | Exit 1: no reviewed cases (denominator 0) |
+
+Acceptance coverage:
+
+- A01: unregistered NG startup → persisted revision, `prepare-registration` applicable with reason referencing recorded facts, CAC links, brief rendered (curl + browser).
+- A02: registered GB business with evidence → registration rules `no`; superseded on regeneration rather than re-asked (unit + DB tests, seeded tenant B).
+- A03: **Not sure** on legal form / regulated activity → stored `unknown`, listed under "Open unknowns", `licence-question` applicability `unknown`, no classification (unit, content, browser).
+- A10: sign-out → sign-in shows revision 2, 13/20 answered, completed item with evidence intact.
+- A14: tenant B gets 404 on A's profile, checklist item PATCH and brief; DB rejects forged `confirm_profile_revision` (`not authorised`).
+- Transitions: skipping states → 422 `invalid_transition`; stale `expectedVersion` → 409 `version_conflict`; founder `reviewer_verified` → 422.
+
+Browser evidence: `/companies/:id/overview` (current position, coverage, next steps, open unknowns), `/profile` (grouped adaptive form with Not sure/Skip, revision history), `/checklist` (transitions, evidence form, sources), brief opened in new tab. Desktop and mobile screenshots stored in the thread.
+
+Mode: `synthetic_demo` labelled on assessment, checklist notice and brief. Legal-content version: `synthetic-starter-0.1.0` (not legal content).
+
+Limitations: rules are generic preparation steps, not jurisdiction law; no statutory deadlines; no document upload for registration evidence (text assertion only); reviewer role exists in transitions but invites arrive in M6; assessment runs synchronously (deterministic, no job); brief is HTML only (no PDF/DOCX); Playwright E2E still pending.
+
+Next task: M2 Content system (source/version registry, publication workflow, scoped rules/templates, draft packs).

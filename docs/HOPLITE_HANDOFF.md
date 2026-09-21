@@ -31,7 +31,7 @@ Official Hoplite material describes connecting GitHub repositories, running agen
 | pnpm seed:demo | Idempotently seed synthetic tenants only; refuse production |
 | pnpm eval:legal | Evaluate reviewed cases, record denominator and unsupported claims |
 
-Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` and `eval:legal` exit with an explicit not-implemented message.
+Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` seeds two synthetic tenants (M1). `eval:legal` exits with an explicit not-implemented message.
 
 ## Paste-ready implementation prompt
 

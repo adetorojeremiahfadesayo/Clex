@@ -3,8 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" },
-  "dependencies": { "@lex/domain": "workspace:*", "pg": "8.23.0", "zod": "4.6.5" },
-  "devDependencies": { "@types/pg": "8.23.1" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@lex/domain": "workspace:*",
+    "pg": "8.23.0",
+    "zod": "4.6.5",
+    "@lex/content": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/pg": "8.23.1"
+  }
 }

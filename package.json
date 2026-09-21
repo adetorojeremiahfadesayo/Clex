@@ -17,7 +17,7 @@
     "build": "pnpm -r --if-present build",
     "db:setup": "tsx packages/db/src/cli/setup.ts",
     "db:migrate": "tsx packages/db/src/cli/migrate.ts",
-    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed:demo": "tsx packages/db/src/cli/seed-demo.ts",
     "eval:legal": "tsx scripts/eval-legal.ts"
   },
   "devDependencies": {
