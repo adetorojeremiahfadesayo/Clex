@@ -20,7 +20,7 @@ export const GET = handle(async (_request: Request, ctx: Ctx) => {
       companyId, actorId: user.id, action: "export.brief_rendered", objectType: "profile_revision",
       objectId: data.revision?.id ?? "none", objectVersion: String(data.revision?.version ?? 0),
     });
-    return renderBriefHtml(company, data, buildChecklistView(data), generatedAt);
+    return renderBriefHtml(company, data, buildChecklistView(data, data.pack), generatedAt);
   });
   const safeName = company.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
   return new Response(html, {

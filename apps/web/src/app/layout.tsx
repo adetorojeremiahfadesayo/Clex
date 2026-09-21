@@ -22,6 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div className="flex items-center gap-3 text-sm">
               {user ? (
                 <>
+                  <Link href="/content" className="underline-offset-2 hover:underline">Content</Link>
                   <span className="hidden text-slate-600 sm:inline">{user.displayName}</span>
                   <SignOutButton />
                 </>

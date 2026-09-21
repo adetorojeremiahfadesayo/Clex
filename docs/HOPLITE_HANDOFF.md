@@ -29,9 +29,10 @@ Official Hoplite material describes connecting GitHub repositories, running agen
 | pnpm build | Production compilation |
 | pnpm db:migrate | Apply versioned SQL migrations to explicitly selected environment |
 | pnpm seed:demo | Idempotently seed synthetic tenants only; refuse production |
+| pnpm seed:content | Idempotently seed source registry and DRAFT packs; refuse production |
 | pnpm eval:legal | Evaluate reviewed cases, record denominator and unsupported claims |
 
-Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` seeds two synthetic tenants (M1). `eval:legal` exits with an explicit not-implemented message.
+Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` seeds two synthetic tenants (M1); `seed:content` seeds the source registry and five draft packs plus editor/reviewer users (M2). `eval:legal` runs every manifest's reviewer cases and prints the denominator (M2).
 
 ## Paste-ready implementation prompt
 

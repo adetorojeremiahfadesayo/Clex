@@ -23,10 +23,14 @@ export default async function setup(): Promise<() => Promise<void>> {
   url.pathname = `/${dbName}`;
   const pool = new pg.Pool({ connectionString: url.toString() });
   await runMigrations(pool, path.resolve("supabase/migrations"));
+  // Roles are cluster-wide, so tests log in as throwaway members of lex_app/lex_worker
+  // instead of rotating the shared roles' passwords (which would lock out a running dev server).
   const appPw = randomBytes(12).toString("hex");
   const workerPw = randomBytes(12).toString("hex");
-  await pool.query(`alter role lex_app login password '${appPw}'`);
-  await pool.query(`alter role lex_worker login password '${workerPw}'`);
+  const appRole = `${dbName}_app`;
+  const workerRole = `${dbName}_worker`;
+  await pool.query(`create role "${appRole}" login password '${appPw}' in role lex_app inherit`);
+  await pool.query(`create role "${workerRole}" login password '${workerPw}' in role lex_worker inherit bypassrls`);
   await pool.end();
 
   const withUser = (u: string, p: string) => {
@@ -36,13 +40,15 @@ export default async function setup(): Promise<() => Promise<void>> {
     return x.toString();
   };
   process.env.TEST_DATABASE_URL = url.toString();
-  process.env.TEST_APP_DATABASE_URL = withUser("lex_app", appPw);
-  process.env.TEST_WORKER_DATABASE_URL = withUser("lex_worker", workerPw);
+  process.env.TEST_APP_DATABASE_URL = withUser(appRole, appPw);
+  process.env.TEST_WORKER_DATABASE_URL = withUser(workerRole, workerPw);
 
   return async () => {
     const c = new pg.Client({ connectionString: admin });
     await c.connect();
     await c.query(`drop database if exists "${dbName}" with (force)`);
+    await c.query(`drop role if exists "${appRole}"`);
+    await c.query(`drop role if exists "${workerRole}"`);
     await c.end();
   };
 }

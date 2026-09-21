@@ -1,17 +1,17 @@
 # Implementation status
 
-Updated: 2026-09-21 (M1 company start).
+Updated: 2026-09-21 (M2 content system).
 
 | Area | Status |
 |---|---|
 | Agreed product direction | Documented |
 | Implementation plan and Hoplite prompt | Prepared |
-| Application code | M0 merged; M1 implemented and tested locally (adds `packages/content`, profile/checklist/overview pages, `/api/v1` profile, assessments, checklist and brief export) |
+| Application code | M0 merged; M1 in PR #2; M2 implemented and tested locally on top of M1 (source registry, pack versions, publication workflow, evaluator, `/content` admin UI, pack-aware assessment) |
 | Database/auth/storage | Local PostgreSQL 16 with RLS, versioned SQL migrations, cookie sessions (scrypt password hashes). Supabase project and object storage not configured |
 | Live model integration | Not configured; `/api/ready` reports `no_model_configured`. No model calls exist yet |
-| Jurisdiction packs | Research pointers only (six official directory URLs, checked 2026-09-21). Checklist uses explicitly labelled **synthetic starter rules** (`synthetic-starter-0.1.0`); nothing reviewed or published |
-| Automated tests | 39 Vitest tests passing locally (isolation, job queue, migrations, env, adaptive intake, transitions, synthetic assessment, revisions/checklist persistence). Playwright E2E not yet written |
-| Browser verification | M0 journey plus profile intake → auto-regenerated checklist → transition with evidence → brief → sign-out/in persistence inspected on desktop (1440×900) and mobile (390×844) |
+| Jurisdiction packs | Registry and workflow implemented. Five **draft** formation packs (NG, GB, US, EU, CN) seeded from the six official directory pointers; generic preparation rules only, no jurisdiction law, no deadlines. Nothing published by seed; a reviewer publishes only after a passing evaluation. Synthetic starter rules remain the fallback |
+| Automated tests | 50 Vitest tests passing locally (adds publication gate, RLS on drafts, schema cross-checks, evaluator, DSL interpreter, scope resolution, A24 fallback). Playwright E2E not yet written |
+| Browser verification | M0/M1 journeys plus reviewer: pack under review → Publish blocked by gate → run 4 cases → Publish succeeds; desktop (1440×900) and mobile (390×844) |
 | Hoplite repository connection | Connected; `.hoplite/settings.json` provides setup and run scripts |
 | Preview/production deployment | Hoplite preview only (dev server). Not deployed to production |
 
@@ -106,3 +106,43 @@ Mode: `synthetic_demo` labelled on assessment, checklist notice and brief. Legal
 Limitations: rules are generic preparation steps, not jurisdiction law; no statutory deadlines; no document upload for registration evidence (text assertion only); reviewer role exists in transitions but invites arrive in M6; assessment runs synchronously (deterministic, no job); brief is HTML only (no PDF/DOCX); Playwright E2E still pending.
 
 Next task: M2 Content system (source/version registry, publication workflow, scoped rules/templates, draft packs).
+
+### M2 Content system — 2026-09-21
+
+Environment: Hoplite sandbox (Modal), Node v24.19.0, pnpm 10.26.0, PostgreSQL 16.14 local. Branch `feat/m2-content-system` stacked on `feat/m1-company-start` @ `fad816c` (PR #2 not yet merged).
+
+Implemented:
+
+- Domain (`packages/domain/src/content.ts`): platform roles (`content_editor`, `content_reviewer`, separate from company membership), source/source-version inputs (https only), data-only rule DSL (`applies` predicates → yes/no/unknown, reason templates with `{fact}` slots, mandatory `sourceSlugs`), template schema with declared `{{slots}}`, pack version content schema with cross-checks (rules/templates must cite sources present in `sourceRefs`; capabilities must be backed by rules/templates), reviewer evaluation case schema, pack state machine `draft → under_review → published → stale/withdrawn`.
+- Database (`0003_content_system.sql`): `users.platform_role`, `sources`, `source_versions` (content hash, review state), `packs`, `pack_versions` (content hash, one published per pack), `pack_evaluations`. Trigger enforces: valid transitions; content frozen once out of draft; publication requires reviewer with `content_reviewer` role, reviewer ≠ author, and a passing evaluation on the **exact content hash**; publishing supersedes the prior published version to `stale`. RLS: founders read published/stale only; editors/reviewers read all; writes restricted by platform role. Checklist trigger relaxed so `superseded` items can be revived when content changes (only `reviewer_verified` is terminal).
+- Content (`packages/content`): `evaluatePack` (outcome match + unacceptable-claim scan + uncovered rules), `assessProfile(facts, publishedPack)` → `mode: reviewed_pack` when a published pack is in scope (market + subdivision + matter type), otherwise `synthetic_demo`; `draftPackManifests` for all five markets with four reviewer cases each (normal ×2, missing information, out of scope) and explicit excluded topics.
+- API (`/api/v1/content/*`): sources, source versions, source review, packs, draft versions, draft content edit, evaluate, transition. Reviewer-only for publish/stale/withdraw; author self-publish rejected in code and DB.
+- UI: `/content` (packs, versions, source registry, role banner) and `/content/packs/:versionId` (scope, evaluations with hash match, rules, sources, actions). Company checklist/overview label reviewed vs synthetic content and flag a pack that became stale/withdrawn (A24).
+- Scripts: `pnpm seed:content` (editor + reviewer synthetic users, sources, five draft packs; refuses production), `pnpm eval:legal` (runs all manifest cases, prints denominator, exits non-zero on failures). `db:setup` no longer rotates role passwords on an existing database; tests use per-run member roles.
+
+Commands and outcomes (tested locally; no live model, no production deployment):
+
+| Command | Outcome |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` | 5/5 pass / 0 problems |
+| `PG_ADMIN_URL=… pnpm test` | 9 files, 50/50 pass on a fresh database (three migrations) |
+| `pnpm db:migrate` | `0003_content_system.sql` applied to lex_dev |
+| `pnpm seed:content` | 5 draft packs, 6 sources, editor + reviewer users; idempotent |
+| `pnpm eval:legal` | 20/20 reviewer-authored cases across 5 DRAFT packs; exit 0; prints "No pack is published… not evidence of legal correctness" |
+| `pnpm build` | Production build OK |
+
+Acceptance coverage:
+
+- A05: market selection produces accurate capability state: `research_pointers` + information collection/official links without a published pack; `published` + reviewed checklist once a pack is published for that market and matter type.
+- A06: no published pack → synthetic fallback labelled as such; no fabricated rules. Pack scoped to a subdivision the company is not in → fallback with explicit notice (unit test).
+- A24: reviewer withdrew the NG pack → `findPublishedPack` returns null, regeneration falls back to `synthetic_demo`, prior checklist flagged; withdrawn is terminal (DB test + curl).
+- Publication gate (curl + DB tests): editor publish → 403; reviewer publish from draft → 422 invalid transition; reviewer publish under review without evaluation → 422 `publication_gate`; failing evaluation or evaluation on another hash → still blocked; passing evaluation → published; founder as reviewer_id → rejected by trigger; content hash change after draft → rejected.
+- Isolation: founder cannot see draft versions (RLS) or write sources (403/RLS); founder sees the version only after publication.
+
+Browser evidence: reviewer signed in → `/content/packs/:id` (GB v1 under review) → Publish blocked with gate message → Run 4 reviewer cases (4/4) → Publish → status published, reviewer attributed. Desktop and mobile screenshots stored in the thread.
+
+State left in the local demo database: GB formation starter v1 published (by the synthetic reviewer, after 4/4 cases); NG v1 withdrawn; US/EU/CN drafts. This is demo state, not legal review.
+
+Limitations: draft rules are generic preparation steps citing landing pages only — no jurisdiction-specific sources, employment or supplier packs, or templates yet (`reviewed_template` capability schema exists but no template content); source versions store locators/permitted excerpts, not snapshots; evaluation cases live in the manifests rather than a reviewer-editable UI; no email notification to reviewers on stale/review-due; publish UI is functional but minimal (no diff view between versions).
+
+Next task: M3 Documents and model path (private uploads, constrained parser, spans, queue jobs, provider adapter, evidence validation).

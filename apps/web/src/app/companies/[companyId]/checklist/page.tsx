@@ -43,7 +43,7 @@ export default async function ChecklistPage({ params }: { params: Promise<{ comp
   });
   if (!data) notFound();
   const role = data.memberships.find((m) => m.userId === user.id && !m.revokedAt)?.role ?? "member";
-  const view = buildChecklistView(data.start);
+  const view = buildChecklistView(data.start, data.start.pack);
 
   return (
     <section className="space-y-6">
@@ -66,6 +66,12 @@ export default async function ChecklistPage({ params }: { params: Promise<{ comp
         </div>
       </div>
       <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{view.contentNotice}</p>
+      {data.start.packStale && (
+        <p role="status" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+          The reviewed content pack this checklist was generated from is now <strong>{data.start.pack?.version.status.replace(/_/g, " ")}</strong>
+          {data.start.pack?.version.statusReason ? ` (${data.start.pack.version.statusReason})` : ""}. Items below are shown for your records; regenerate to use current content.
+        </p>
+      )}
       {view.stale && (
         <p role="status" className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
           The profile changed after this checklist was generated. Regenerate to reflect the latest confirmed facts.
