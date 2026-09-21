@@ -60,6 +60,6 @@ Browser evidence: `/sign-up`, `/`, `/companies/new`, `/companies/:id/overview`, 
 
 Mode: `no_model_configured` (reported by `/api/ready`). No synthetic legal output exists. Legal-content version: none.
 
-Limitations: no Supabase Auth/Storage, no uploads, no matters, no profile revisions, no reviewer invites yet; CI workflow is committed at `.github/workflows-pending/ci.yml` because the GitHub App credential lacks `workflows` permission to push into `.github/workflows/`; an admin must move it (see that folder's README); Playwright E2E suite not written; CI uses a local password for the Postgres service container only.
+Limitations: no Supabase Auth/Storage, no uploads, no matters, no profile revisions, no reviewer invites yet; CI workflow installed at `.github/workflows/ci.yml` by the repository owner; first run (lint, typecheck, 19 tests, db:setup, build) passed on PR #1; Playwright E2E suite not written; CI uses a local password for the Postgres service container only.
 
 Next task: M1 Company start (adaptive intake, profile revisions with provenance, assessment, checklist, official links, preparation export).
