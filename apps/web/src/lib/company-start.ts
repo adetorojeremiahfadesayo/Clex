@@ -1,6 +1,10 @@
 import type { PoolClient } from "@lex/db";
 import {
   confirmRevision,
+  findPublishedPack,
+  getPackVersion,
+  listPacks,
+  listSources,
   getCurrentRevision,
   getLatestAssessment,
   insertAssessment,
@@ -8,8 +12,9 @@ import {
   recordAudit,
   syncChecklist,
 } from "@lex/db";
-import { type ConfirmAnswersInput, type FactMap, applyAnswers } from "@lex/domain";
-import { assessProfile, syntheticRules } from "@lex/content";
+import { type ConfirmAnswersInput, type FactMap, type Market, answeredString, applyAnswers, markets } from "@lex/domain";
+import { type OfficialSource, assessProfile, syntheticRules } from "@lex/content";
+import type { PackVersion } from "@lex/domain";
 
 /**
  * Confirms intake answers as a new profile revision, then regenerates the
@@ -34,7 +39,11 @@ export async function regenerateAssessment(
   db: PoolClient,
   input: { companyId: string; actorId: string; revisionId: string; facts: FactMap },
 ) {
-  const result = assessProfile(input.facts);
+  const marketRaw = answeredString(input.facts, "formation_country");
+  const market = markets.includes(marketRaw as Market) ? (marketRaw as Market) : null;
+  // Only a `published` version resolves; stale/withdrawn packs fall back to synthetic rules (A24).
+  const published = market ? await findPublishedPack(db, market, "formation") : null;
+  const result = assessProfile(input.facts, published ? { packId: published.pack.id, slug: published.pack.slug, version: published.version } : null);
   const assessment = await insertAssessment(db, { companyId: input.companyId, profileRevisionId: input.revisionId, result });
   const applicable = result.decisions
     .filter((d) => d.applicability !== "no")
@@ -53,11 +62,28 @@ export async function regenerateAssessment(
 
 /** Everything the overview/checklist pages need in one authorised read. */
 export async function loadCompanyStart(db: PoolClient, companyId: string) {
-  const [revision, assessment, items] = await Promise.all([
-    getCurrentRevision(db, companyId),
-    getLatestAssessment(db, companyId),
-    listChecklist(db, companyId),
-  ]);
+  const revision = await getCurrentRevision(db, companyId);
+  const assessment = await getLatestAssessment(db, companyId);
+  const items = await listChecklist(db, companyId);
   const stale = !!assessment && !!revision && assessment.profileRevisionId !== revision.id;
-  return { revision, assessment, items, stale };
+  // Resolve the exact pack version the assessment was generated from (may be stale/withdrawn now).
+  const packVersionId = assessment?.result.coverage.packVersionId ?? null;
+  const packVersion = packVersionId ? await getPackVersion(db, packVersionId) : null;
+  const pack = packVersion
+    ? { version: packVersion, sources: await packSourcesFor(db, packVersion) }
+    : null;
+  const packStale = !!packVersion && packVersion.status !== "published";
+  return { revision, assessment, items, stale, pack, packStale };
+}
+
+async function packSourcesFor(db: PoolClient, pv: PackVersion): Promise<OfficialSource[]> {
+  const market = (await listPacks(db)).find((p) => p.id === pv.packId)?.market;
+  if (!market) return [];
+  const sources = await listSources(db, market);
+  return pv.content.sourceRefs.flatMap((ref) => {
+    const s = sources.find((x) => x.slug === ref.slug);
+    const v = s?.versions[0];
+    if (!s || !v) return [];
+    return [{ id: s.slug, market, title: s.title, authority: s.authority, url: v.url, checkedAt: v.checked_at, kind: s.kind as OfficialSource["kind"], status: "research_pointer" as const }];
+  });
 }

@@ -6,3 +6,4 @@ export * from "./facts";
 export * from "./intake";
 export * from "./checklist";
 export * from "./assessment";
+export * from "./content";

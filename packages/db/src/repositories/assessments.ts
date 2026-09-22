@@ -101,13 +101,16 @@ export async function syncChecklist(
           applicable.get(item.ruleId),
         ]);
       }
-    } else if (!["user_completed", "reviewer_verified", "superseded"].includes(item.status)) {
+    } else if (item.status === "superseded") {
+      continue;
+    } else if (item.status === "user_completed" || item.status === "reviewer_verified") {
+      // Completed work is preserved; only re-pointed at the new assessment.
+      await db.query("update checklist_items set version = version + 1, assessment_id = $2 where id = $1", [item.id, input.assessment.id]);
+    } else {
       await db.query("update checklist_items set status = 'superseded', version = version + 1, assessment_id = $2 where id = $1", [
         item.id,
         input.assessment.id,
       ]);
-    } else if (item.status !== "superseded") {
-      await db.query("update checklist_items set version = version + 1, assessment_id = $2 where id = $1", [item.id, input.assessment.id]);
     }
   }
   for (const [ruleId, version] of applicable) {

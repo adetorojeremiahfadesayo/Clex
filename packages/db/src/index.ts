@@ -8,3 +8,4 @@ export * from "./repositories/jobs";
 export * from "./repositories/profile";
 export * from "./repositories/assessments";
 export * from "./repositories/audit";
+export * from "./repositories/content";

@@ -12,5 +12,5 @@ export const GET = handle(async (_request: Request, ctx: Ctx) => {
   const { companyId } = await ctx.params;
   await resolveCompanyForActor(companyId, user.id);
   const data = await asActor(user.id, (db) => loadCompanyStart(db, companyId));
-  return NextResponse.json(buildChecklistView(data));
+  return NextResponse.json(buildChecklistView(data, data.pack));
 });

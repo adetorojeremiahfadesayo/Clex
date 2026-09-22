@@ -19,6 +19,8 @@ export const coverageSchema = z.object({
   market: z.string().nullable(),
   subdivision: z.string().nullable(),
   packId: z.string().nullable(),
+  packVersionId: z.string().nullable().default(null),
+  packVersion: z.number().int().nullable().default(null),
   packStatus: z.enum(["none", "research_pointers", "draft", "under_review", "published", "stale", "withdrawn"]),
   capabilities: z.array(z.enum(["information_collection", "official_links", "reviewed_checklist", "reviewed_explanation", "reviewed_template", "document_review"])),
   notice: z.string(),
@@ -26,8 +28,8 @@ export const coverageSchema = z.object({
 export type Coverage = z.infer<typeof coverageSchema>;
 
 export const assessmentResultSchema = z.object({
-  /** Always synthetic_demo until reviewed packs exist; never claims live model output. */
-  mode: z.literal("synthetic_demo"),
+  /** Which content produced this: synthetic starter rules or a published reviewed pack. Never a live model claim. */
+  mode: z.enum(["synthetic_demo", "reviewed_pack"]),
   contentVersion: z.string(),
   confirmedFactKeys: z.array(factKeySchema),
   unknownFactKeys: z.array(factKeySchema),

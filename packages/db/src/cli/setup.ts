@@ -16,8 +16,10 @@ if (process.env.APP_ENV === "production") {
 
 const admin = process.env.PG_ADMIN_URL ?? "postgres://postgres@localhost:5432/postgres";
 const dbName = process.env.PG_DB_NAME ?? "lex_dev";
-const appPassword = process.env.LEX_APP_PASSWORD ?? randomBytes(18).toString("base64url");
-const workerPassword = process.env.LEX_WORKER_PASSWORD ?? randomBytes(18).toString("base64url");
+// Explicit passwords win; otherwise a fresh database gets random ones and an existing
+// database keeps whatever it has, so a stray re-run cannot lock out a running server.
+const explicitApp = process.env.LEX_APP_PASSWORD;
+const explicitWorker = process.env.LEX_WORKER_PASSWORD;
 
 const ident = (s: string) => `"${s.replace(/"/g, '""')}"`;
 const literal = (s: string) => `'${s.replace(/'/g, "''")}'`;
@@ -32,8 +34,13 @@ await adminClient.end();
 
 const pool = new pg.Pool({ connectionString: adminUrl.toString() });
 const applied = await runMigrations(pool, path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../supabase/migrations"));
-await pool.query(`alter role lex_app login password ${literal(appPassword)}`);
-await pool.query(`alter role lex_worker login password ${literal(workerPassword)}`);
+const fresh = exists.rowCount === 0;
+const appPassword = explicitApp ?? (fresh ? randomBytes(18).toString("base64url") : null);
+const workerPassword = explicitWorker ?? (fresh ? randomBytes(18).toString("base64url") : null);
+if (appPassword) await pool.query(`alter role lex_app login password ${literal(appPassword)}`);
+else await pool.query("alter role lex_app login");
+if (workerPassword) await pool.query(`alter role lex_worker login password ${literal(workerPassword)}`);
+else await pool.query("alter role lex_worker login");
 await pool.end();
 
 const mk = (user: string, pw: string) => {
@@ -44,5 +51,7 @@ const mk = (user: string, pw: string) => {
 };
 console.log(`# database ${dbName} ready; migrations applied: ${applied.length}`);
 console.log(`export DATABASE_URL=${adminUrl.toString()}`);
-console.log(`export APP_DATABASE_URL=${mk("lex_app", appPassword)}`);
-console.log(`export WORKER_DATABASE_URL=${mk("lex_worker", workerPassword)}`);
+if (appPassword) console.log(`export APP_DATABASE_URL=${mk("lex_app", appPassword)}`);
+else console.log("# APP_DATABASE_URL unchanged: existing lex_app password kept (set LEX_APP_PASSWORD to rotate)");
+if (workerPassword) console.log(`export WORKER_DATABASE_URL=${mk("lex_worker", workerPassword)}`);
+else console.log("# WORKER_DATABASE_URL unchanged: existing lex_worker password kept (set LEX_WORKER_PASSWORD to rotate)");

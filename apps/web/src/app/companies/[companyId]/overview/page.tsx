@@ -27,7 +27,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
   const myRole = memberships.find((m) => m.userId === user.id && !m.revokedAt)?.role ?? "member";
   const facts = start.revision?.facts ?? {};
   const progress = intakeProgress(facts);
-  const view = buildChecklistView(start);
+  const view = buildChecklistView(start, start.pack);
   const result = start.assessment?.result;
   const nextSteps = view.entries.filter((e) => !["user_completed", "reviewer_verified", "dismissed_with_reason"].includes(e.item.status)).slice(0, 3);
 
@@ -64,6 +64,9 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
         <article className="rounded border border-slate-200 bg-white p-4">
           <h2 className="font-medium">Coverage</h2>
           <p className="mt-2 text-sm text-slate-700">{result?.coverage.notice ?? "Select a formation market in the profile to see which official directories apply."}</p>
+          {start.packStale && (
+            <p className="mt-2 text-sm text-red-800">Content pack used for the last assessment is {start.pack?.version.status.replace(/_/g, " ")}; regenerate from the checklist.</p>
+          )}
           {result && (
             <p className="mt-2 text-xs text-slate-500">
               Pack status: {result.coverage.packStatus.replace(/_/g, " ")} · capabilities: {result.coverage.capabilities.map((c) => c.replace(/_/g, " ")).join(", ")}
