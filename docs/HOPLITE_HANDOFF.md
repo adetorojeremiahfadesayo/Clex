@@ -1,5 +1,7 @@
 # Hoplite handoff
 
+> Updated 25 September 2026: the project now has a working local matter workspace and uses automatic private browser sessions. Earlier references below to building an authenticated vertical slice describe the original plan. For the current implementation and remaining gaps, use [STATUS.md](STATUS.md) and the README. Do not recreate sign-in/sign-out screens. Persist PostgreSQL data and configure the RLS-bound `APP_DATABASE_URL`; document bytes are stored in the database. A real model call still needs a server-side provider key and verification.
+
 ## What is ready
 
 This private repository contains the plan plus the M0 foundation scaffold (pnpm workspace, migrations, web, worker, tests, CI). `.hoplite/settings.json` defines the sandbox setup and run scripts. No application secrets or deployed services exist; see docs/STATUS.md for verified state.
@@ -29,9 +31,10 @@ Official Hoplite material describes connecting GitHub repositories, running agen
 | pnpm build | Production compilation |
 | pnpm db:migrate | Apply versioned SQL migrations to explicitly selected environment |
 | pnpm seed:demo | Idempotently seed synthetic tenants only; refuse production |
+| pnpm seed:content | Idempotently seed source registry and DRAFT packs; refuse production |
 | pnpm eval:legal | Evaluate reviewed cases, record denominator and unsupported claims |
 
-Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` and `eval:legal` exit with an explicit not-implemented message.
+Status after M0: `dev`, `dev:worker`, `lint`, `typecheck`, `test`, `build`, `db:migrate` and `db:setup` are implemented and were run locally. `test:e2e` is configured but has no journeys yet. `seed:demo` seeds two synthetic tenants (M1); `seed:content` seeds the source registry and five draft packs plus editor/reviewer users (M2). `eval:legal` runs every manifest's reviewer cases and prints the denominator (M2).
 
 ## Paste-ready implementation prompt
 

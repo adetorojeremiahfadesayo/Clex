@@ -5,3 +5,8 @@ export * from "./repositories/users";
 export * from "./repositories/sessions";
 export * from "./repositories/companies";
 export * from "./repositories/jobs";
+export * from "./repositories/profile";
+export * from "./repositories/assessments";
+export * from "./repositories/audit";
+export * from "./repositories/content";
+export * from "./repositories/matters";

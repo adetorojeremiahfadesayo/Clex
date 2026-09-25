@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "packageManager": "pnpm@10.26.0",
+  "packageManager": "pnpm@11.19.0",
   "engines": {
     "node": ">=22"
   },
@@ -17,8 +17,9 @@
     "build": "pnpm -r --if-present build",
     "db:setup": "tsx packages/db/src/cli/setup.ts",
     "db:migrate": "tsx packages/db/src/cli/migrate.ts",
-    "seed:demo": "tsx scripts/seed-demo.ts",
-    "eval:legal": "tsx scripts/eval-legal.ts"
+    "seed:demo": "tsx packages/db/src/cli/seed-demo.ts",
+    "eval:legal": "tsx scripts/eval-legal.ts",
+    "seed:content": "tsx packages/db/src/cli/seed-content.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
@@ -28,5 +29,8 @@
     "tsx": "4.23.15",
     "typescript": "5.9.3",
     "vitest": "4.1.11"
+  },
+  "dependencies": {
+    "@lex/content": "workspace:*"
   }
 }

@@ -53,3 +53,7 @@ Documents can be summarised factually before legal coverage exists, but do not c
 - Reviewer role and professional qualification/scope are distinct records; never assume a team invitation verifies credentials.
 - No new legal-source publication or approval from model output or user-uploaded instructions.
 - Coverage expansion is additive; avoid claiming full support for an entire nation from one formation checklist.
+
+## Implementation status (2026-09-21)
+
+The registry, versioning, publication workflow and evaluator described above are implemented (see `supabase/migrations/0003_content_system.sql`, `packages/domain/src/content.ts`, `packages/content`). Five **draft** formation packs exist, one per target market, containing generic preparation rules that cite only the official directory pointers in this document. They are bootstrap content for the workflow, not reviewed legal rules. Publication requires a `content_reviewer` who is not the author and a passing evaluation on the exact content hash; the database enforces this independently of the API.

@@ -47,7 +47,7 @@ The assessment yields confirmed facts, missing facts, prioritised next steps and
 
 ### A. Getting started
 
-Routes: /sign-in, /onboarding, /companies/:id/overview, /companies/:id/profile, /companies/:id/checklist.
+Routes: /, /companies/new, /companies/:id/overview, /companies/:id/profile, /companies/:id/checklist. The 25 September build removes end-user sign-in/sign-out and creates an isolated browser workspace automatically; see docs/STATUS.md for the resulting recovery limitation.
 
 Onboarding branches by status, activities and locations. An unregistered business receives an appropriately scoped registration preparation path. A registered company can skip completed formation steps and upload evidence. Where a legal form is uncertain, explain options from reviewed content and gather facts; do not silently choose an entity type.
 

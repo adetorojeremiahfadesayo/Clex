@@ -4,17 +4,20 @@ Working name for a company-specific legal and compliance workspace for startups 
 
 The product learns the company's confirmed context, assesses its starting position, explains next steps, and supports employment, supplier/commercial, and other business matters as the company grows. Lawyer review is part of this continuing workflow, not the entire product.
 
-**Status: M0 foundation scaffold (auth, tenant isolation, job queue, CI) is implemented and tested locally. No legal guidance, model integration, or production deployment exists yet. See [docs/STATUS.md](docs/STATUS.md).**
+**Status (25 September 2026):** Company onboarding, profile, checklist, three matter paths, private TXT/DOCX/text-PDF uploads, contextual preparation analysis, editable draft outlines, action items and printable lawyer packets work locally. Sign-in and sign-out screens have been removed; each browser receives an isolated guest workspace. A live OpenAI or Anthropic model adapter is implemented but has **not** been exercised with a real key. Legal packs remain unreviewed, and this is not a production legal service. See [docs/STATUS.md](docs/STATUS.md).
 
 ## Local development
 
 ```bash
 pnpm install
-source scripts/dev-env.sh   # starts local Postgres 16, creates lex_dev, applies migrations, exports *_DATABASE_URL
+source scripts/dev-env.sh   # Linux/Hoplite: starts Postgres, applies migrations, exports DB URLs
 pnpm dev                    # web on http://localhost:3000
-pnpm dev:worker             # durable job worker (separate terminal)
-PG_ADMIN_URL=postgres://postgres:postgres@localhost:5432/postgres pnpm test
+PG_ADMIN_URL=postgres://postgres@localhost:5432/postgres pnpm test
 ```
+
+For other environments, create the database and `lex_app` role with `pnpm db:setup`, then set `DATABASE_URL` and `APP_DATABASE_URL` in `apps/web/.env.local` (copy `.env.example`). The web server needs the RLS-bound `APP_DATABASE_URL`; the privileged URL is used for migrations. In production, use managed PostgreSQL and persistent backups. Documents are stored privately in PostgreSQL rather than an ephemeral app filesystem.
+
+Set `LLM_PROVIDER=openai` or `anthropic`, `LLM_MODEL` and `LLM_API_KEY` server-side to enable a live model call. The user must opt in to external processing per analysis. With no key, the app visibly runs local preparation questions instead. Provider failure is recorded as failure and does not masquerade as a successful analysis.
 
 ## Start here
 
@@ -31,7 +34,7 @@ Company profile → current-position assessment → personalised starting checkl
 
 Target markets: Nigeria, the UK, the US, European countries and China. The application must distinguish selecting a market from having reviewed guidance for that market and matter type.
 
-Development platform: Hoplite. Proposed stack: TypeScript, Next.js, PostgreSQL, Supabase Auth/Storage, and a durable worker. Production hosting and LLM provider remain configurable.
+Development platform: Hoplite. Current stack: TypeScript, Next.js and PostgreSQL with row-level security. The separate job worker remains in the repository for existing jobs; matter analysis currently runs in a server request. Production hosting and LLM provider remain configurable.
 
 ## Boundaries
 
