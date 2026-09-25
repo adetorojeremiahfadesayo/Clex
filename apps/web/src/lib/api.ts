@@ -29,7 +29,7 @@ export async function parseBody<T>(request: Request, schema: ZodType<T>): Promis
 
 export async function requireUser(): Promise<SessionUser> {
   const user = await currentUser();
-  if (!user) throw new ApiError(401, "unauthenticated", "Sign in required");
+  if (!user) throw new ApiError(401, "workspace_required", "Open the workspace in this browser first");
   return user;
 }
 

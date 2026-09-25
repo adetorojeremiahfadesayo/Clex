@@ -1,6 +1,19 @@
 # Implementation status
 
-Updated: 2026-09-21 (M2 content system).
+Updated: 2026-09-25 (matter workspace build). Historical milestone notes below describe their state at the time; this section is current.
+
+### Current implementation — 2026-09-25
+
+- **End-user account screens removed.** Opening the site creates an isolated guest identity and secure cookie session automatically. No sign-in or sign-out routes remain. Data remains tied to that browser session; clearing cookies or session expiry loses access because recovery is not implemented. This is acceptable for a private hackathon preview, not a production account model.
+- **M3/M4 usable path:** company profile and checklist lead to employment, supplier and other matters. Each matter keeps its own context, private TXT/DOCX/text-PDF files (10 MB, PDF page limit), extracted text, analyses, editable draft outlines, action items and printable lawyer packet. Uploads live in PostgreSQL bytea under tenant RLS. Deleting a document removes its linked analyses and matter drafts.
+- **Contextual analysis:** with no model credentials, a labelled local preparation run identifies missing inputs and points to actual excerpts where found. A server-side OpenAI Responses/Anthropic Messages adapter exists and requires explicit per-run consent; model output is schema-validated and document excerpts must be exact substrings. Provider failure persists as failed, with no silent fallback. No live provider request has been verified.
+- **Review boundary:** packets and drafts are explicitly unreviewed. No attorney approval, verified legal advice, reviewed employment/supplier templates, reviewer invite flow, durable analysis queue, OCR, or account recovery yet. The five jurisdiction packs remain draft/research pointers until a distinct qualified reviewer validates and publishes them.
+- **Local evidence:** PostgreSQL migrations `0001`–`0005` applied; 52/52 tests pass on a fresh PostgreSQL database, including new cross-tenant matter/file isolation and derived-data deletion. Strict typecheck, lint and production build pass. A rendered browser journey created a company/profile/employment matter, uploaded TXT, DOCX and text PDF files, produced local context-specific findings and a draft outline, and opened the printable packet. Supplier and other matters were also created and analysed in the browser. The first PDF attempt exposed a bundling error; marking the parsers server-external fixed it and the second upload extracted text successfully. A local PostgreSQL process exit caused one temporary 500 during the supplier pass; retry after restart succeeded. No cloud deployment or public URL was verified.
+- **Next before submission:** configure and verify one real model call; lawyer review and publish an initial narrow pack (or clearly demo limited coverage); finish file/parser abuse limits and deployment backups; capture walkthrough and submit. Do not describe these as finished.
+
+### Historical snapshots (21 September 2026)
+
+The following table and milestone notes are retained as development history, not the current feature status.
 
 | Area | Status |
 |---|---|

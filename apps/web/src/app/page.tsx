@@ -9,33 +9,33 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/api/guest?next=/");
   const companies = await asActor(user.id, (db) => listCompanies(db));
 
   return (
-    <section className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Your companies</h1>
-        <Link href="/companies/new" className="rounded bg-[var(--accent)] px-3 py-2 text-sm font-medium text-white">
-          Add a company
-        </Link>
+    <section className="space-y-8">
+      <div className="rounded-2xl bg-[#183b50] px-6 py-8 text-white sm:px-9 sm:py-10">
+        <span className="text-xs font-semibold uppercase tracking-[.16em] text-blue-200">A legal workspace that learns your business</span>
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-5"><div><h1 className="max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">Start well. Keep your company ready.</h1><p className="mt-3 max-w-xl text-sm leading-6 text-blue-100">Confirm your company profile, see starting tasks, then prepare contracts and questions with the context your lawyer needs.</p></div><Link href="/companies/new" className="rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-[#183b50]">Add a company →</Link></div>
       </div>
+      <div><div className="mb-3 flex items-center justify-between"><h2 className="text-xl font-semibold">Your companies</h2><span className="text-sm text-slate-500">{companies.length} workspaces</span></div>
       {companies.length === 0 ? (
-        <p className="rounded border border-dashed border-slate-300 bg-white p-6 text-slate-600">
-          You have no companies yet. Add one to begin building its confirmed profile.
+        <p className="card border-dashed p-6 text-slate-600">
+          You have no companies yet. Add one to build a confirmed profile and tailored starting checklist.
         </p>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {companies.map((c) => (
-            <li key={c.id} className="rounded border border-slate-200 bg-white p-4">
-              <Link href={`/companies/${c.id}/overview`} className="font-medium underline-offset-2 hover:underline">
+            <li key={c.id} className="card p-5">
+              <Link href={`/companies/${c.id}/overview`} className="text-lg font-semibold underline-offset-2 hover:underline">
                 {c.name}
               </Link>
-              <p className="mt-1 text-sm text-slate-600">{lifecycleStageLabels[c.lifecycleStage]}</p>
+              <p className="mt-1 text-sm text-slate-600">{lifecycleStageLabels[c.lifecycleStage]}</p><Link href={`/companies/${c.id}/matters`} className="mt-4 inline-block text-sm font-medium text-[var(--accent)] underline">Open contracts & matters →</Link>
             </li>
           ))}
         </ul>
-      )}
+      )}</div>
+      <p className="text-xs text-slate-500">Each browser gets a private workspace automatically. Keep this browser’s cookies to retain access; this preview does not offer account recovery.</p>
     </section>
   );
 }

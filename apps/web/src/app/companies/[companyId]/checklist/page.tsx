@@ -32,7 +32,7 @@ function toCard(e: ChecklistEntry): ChecklistCardData {
 
 export default async function ChecklistPage({ params }: { params: Promise<{ companyId: string }> }) {
   const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/api/guest?next=/");
   const { companyId } = await params;
   if (!uuidSchema.safeParse(companyId).success) notFound();
   const data = await asActor(user.id, async (db) => {

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PackVersionPage({ params }: { params: Promise<{ versionId: string }> }) {
   const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/api/guest?next=/");
   const { versionId } = await params;
   if (!uuidSchema.safeParse(versionId).success) notFound();
   const data = await asActor(user.id, async (db) => {

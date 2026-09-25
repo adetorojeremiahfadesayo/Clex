@@ -14,7 +14,7 @@ const promptFor = (key: FactKey) => intakeQuestions.find((q) => q.key === key)?.
 
 export default async function OverviewPage({ params }: { params: Promise<{ companyId: string }> }) {
   const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/api/guest?next=/");
   const { companyId } = await params;
   if (!uuidSchema.safeParse(companyId).success) notFound();
   const data = await asActor(user.id, async (db) => {
@@ -95,6 +95,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
         )}
         <div className="mt-3 flex flex-wrap gap-4 text-sm">
           <Link href={`/companies/${company.id}/checklist`} className="underline">Open checklist</Link>
+          <Link href={`/companies/${company.id}/matters`} className="underline">Contracts & matters</Link>
           <a href={`/api/v1/companies/${company.id}/exports/brief`} target="_blank" rel="noopener" className="underline">Preparation brief</a>
           <Link href={`/companies/${company.id}/jobs`} className="underline">Background jobs</Link>
         </div>

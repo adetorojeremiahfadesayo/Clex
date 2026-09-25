@@ -7,7 +7,7 @@ import { currentUser } from "@/lib/session";
 async function createCompanyAction(formData: FormData) {
   "use server";
   const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/api/guest?next=/companies/new");
   const parsed = createCompanyInputSchema.safeParse({
     name: formData.get("name"),
     lifecycleStage: formData.get("lifecycleStage"),
@@ -18,7 +18,7 @@ async function createCompanyAction(formData: FormData) {
 }
 
 export default async function NewCompanyPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  if (!(await currentUser())) redirect("/sign-in");
+  if (!(await currentUser())) redirect("/api/guest?next=/companies/new");
   const { error } = await searchParams;
   return (
     <section className="mx-auto max-w-lg space-y-6">

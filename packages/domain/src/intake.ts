@@ -72,7 +72,7 @@ export const intakeQuestions: IntakeQuestion[] = [
     key: "registration_evidence",
     group: "identity",
     prompt: "Describe the registration evidence you hold (for example, certificate type and date).",
-    help: "Uploading the document arrives in a later milestone. Recording it here is a user assertion, not a verification.",
+    help: "Describe the evidence here. You can upload a copy in a matter; the description is still a user assertion, not official verification.",
     kind: "text",
     allowUnknown: true,
     allowSkip: true,

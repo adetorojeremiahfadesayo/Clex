@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
 import type { SessionUser } from "@lex/domain";
-import { createSession, findSessionUser, revokeSession } from "@lex/db";
+import { createSession, findSessionUser } from "@lex/db";
 import { asActor } from "./db";
 import { env } from "./env";
 
@@ -25,11 +25,4 @@ export const currentUser = cache(async (): Promise<SessionUser | null> => {
 export async function startSession(userId: string): Promise<void> {
   const token = await asActor(null, (db) => createSession(db, userId, env().SESSION_TTL_HOURS));
   (await cookies()).set(SESSION_COOKIE, token, cookieOptions());
-}
-
-export async function endSession(): Promise<void> {
-  const store = await cookies();
-  const token = store.get(SESSION_COOKIE)?.value;
-  if (token) await asActor(null, (db) => revokeSession(db, token));
-  store.delete(SESSION_COOKIE);
 }

@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ContentPage() {
   const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/api/guest?next=/");
   const data = await asActor(user.id, async (db) => ({ role: await getPlatformRole(db, user.id), packs: await listPacks(db), sources: await listSources(db) }));
   const editorial = data.role !== "none";
 

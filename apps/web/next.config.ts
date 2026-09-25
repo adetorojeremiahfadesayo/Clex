@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  serverExternalPackages: ["pg"],
+  serverExternalPackages: ["pg", "pdf-parse", "mammoth"],
   transpilePackages: ["@lex/domain", "@lex/db"],
   // Dev resources (HMR, fonts) are blocked for non-localhost origins by default;
   // sandbox previews reach the dev server through 127.0.0.1 and a proxy host.

@@ -1,5 +1,7 @@
 # Hoplite handoff
 
+> Updated 25 September 2026: the project now has a working local matter workspace and uses automatic private browser sessions. Earlier references below to building an authenticated vertical slice describe the original plan. For the current implementation and remaining gaps, use [STATUS.md](STATUS.md) and the README. Do not recreate sign-in/sign-out screens. Persist PostgreSQL data and configure the RLS-bound `APP_DATABASE_URL`; document bytes are stored in the database. A real model call still needs a server-side provider key and verification.
+
 ## What is ready
 
 This private repository contains the plan plus the M0 foundation scaffold (pnpm workspace, migrations, web, worker, tests, CI). `.hoplite/settings.json` defines the sandbox setup and run scripts. No application secrets or deployed services exist; see docs/STATUS.md for verified state.

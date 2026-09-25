@@ -1,4 +1,4 @@
-import { randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
+import { randomBytes, randomUUID, scrypt as scryptCb } from "node:crypto";
 import { promisify } from "node:util";
 import type { Queryable } from "../pool";
 
@@ -17,18 +17,20 @@ export async function hashPassword(password: string): Promise<string> {
   return `scrypt$${salt.toString("base64")}$${key.toString("base64")}`;
 }
 
-export async function verifyPassword(password: string, stored: string): Promise<boolean> {
-  const [scheme, saltB64, keyB64] = stored.split("$");
-  if (scheme !== "scrypt" || !saltB64 || !keyB64) return false;
-  const expected = Buffer.from(keyB64, "base64");
-  const actual = (await scrypt(password, Buffer.from(saltB64, "base64"), expected.length)) as Buffer;
-  return actual.length === expected.length && timingSafeEqual(actual, expected);
-}
-
 export class EmailTakenError extends Error {
   constructor() {
     super("email already registered");
   }
+}
+
+/** An isolated browser workspace. There is deliberately no reusable password. */
+export async function createGuestUser(db: Queryable): Promise<UserRow> {
+  const { rows } = await db.query<UserRow>(
+    `insert into users (email, display_name, password_hash) values ($1, $2, $3)
+     returning id, email, display_name, password_hash`,
+    [`guest-${randomUUID()}@local.invalid`, "Private workspace", `disabled$${randomBytes(32).toString("hex")}`],
+  );
+  return rows[0]!;
 }
 
 export async function createUser(
