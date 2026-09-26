@@ -7,8 +7,9 @@ import { confirmAnswersAndAssess } from "@/lib/company-start";
 import { prepareMatter } from "@/lib/matter-analysis";
 import { env } from "@/lib/env";
 
-const demoName = "LexHack Demo Bakery";
-const sampleAgreement = `SYNTHETIC SAMPLE — NOT A REAL AGREEMENT\n\nDemo Flour Co will deliver flour to LexHack Demo Bakery every Monday. Payment is due within 7 days of invoice. Either party may terminate on 30 days' notice. This agreement is governed by the law of England and Wales.\n`;
+const demoName = "Clex Demo Bakery";
+const legacyDemoName = "LexHack Demo Bakery";
+const sampleAgreement = `SYNTHETIC SAMPLE — NOT A REAL AGREEMENT\n\nDemo Flour Co will deliver flour to Clex Demo Bakery every Monday. Payment is due within 7 days of invoice. Either party may terminate on 30 days' notice. This agreement is governed by the law of England and Wales.\n`;
 
 /** Each judge receives an isolated, persistent copy. No shared guest session or public tenant ID. */
 export const POST = handle(async (request: Request) => {
@@ -17,7 +18,7 @@ export const POST = handle(async (request: Request) => {
   }
   const user = await requireUser();
   const companyId = await asActor(user.id, async (db) => {
-    const existing = (await listCompanies(db)).find((company) => company.name === demoName);
+    const existing = (await listCompanies(db)).find((company) => company.name === demoName || company.name === legacyDemoName);
     if (existing) return existing.id;
 
     const company = await createCompanyWithOwner(db, { name: demoName, lifecycleStage: "pre_registration" });

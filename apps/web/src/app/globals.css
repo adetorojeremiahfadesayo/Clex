@@ -58,7 +58,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-scene-heading { margin-top: 1rem; font-family: var(--font-display); font-size: clamp(1.1rem, 2vw, 1.7rem); line-height: 1.1; }
 .clex-scene-highlight { margin-top: 1.2rem; border-left: 3px solid var(--color-coral); background: var(--color-paper); padding: .75rem; font-size: .78rem; line-height: 1.45; }
 .clex-scene-badge { position: absolute; right: 1%; bottom: 3%; max-width: 13rem; border-radius: 1rem; background: var(--color-mint); color: var(--color-forest-deep); padding: .85rem 1rem; font-size: .8rem; font-weight: 750; box-shadow: 0 15px 30px color-mix(in srgb, var(--color-forest-deep) 30%, transparent); animation: clex-bob 5s ease-in-out infinite alternate; }
-.clex-scene-character { position: absolute; width: clamp(125px, 17vw, 210px); left: 1%; bottom: -3%; transform: rotate(-8deg); filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--color-forest-deep) 40%, transparent)); }
+.clex-scene-character { position: absolute; width: clamp(125px, 13vw, 170px); left: -5%; bottom: 28%; transform: rotate(-8deg); filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--color-forest-deep) 40%, transparent)); }
 
 .clex-section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.3rem; }
 .clex-section-title { min-width: 0; font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.08; overflow-wrap: anywhere; }
@@ -101,7 +101,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   .clex-hero-title { max-width: 13ch; }
   .clex-scene { height: 340px; margin-top: -1rem; }
   .clex-scene-sheet { width: 58%; min-height: 60%; }
-  .clex-scene-character { width: 145px; left: 6%; }
+  .clex-scene-character { width: 145px; left: 6%; bottom: -3%; }
   .clex-section-head { align-items: start; flex-direction: column; }
 }
 @media (max-width: 540px) {
