@@ -179,7 +179,7 @@ Next task: M3 Documents and model path (private uploads, constrained parser, spa
 | `pnpm test` | 11 files, 56/56 pass |
 | Browser (1440×900, 390×844) | landing → Click demo answers → create → Pick all → save → revision 1 (18 answers); adaptive follow-ups show demo answers → revision 2, 20/20, 1 Not sure; no horizontal overflow on mobile |
 
-Tested locally only. Not deployed.
+This entry recorded local validation before deployment; see the live verification below.
 
 ### One-page company workspace — 2026-09-26
 
@@ -195,4 +195,10 @@ Tested locally only. Not deployed.
 | Browser 1440×900 | landing → Click demo answers → Pick all → Save (20/20, 1 Not sure, revision 1, 6 checklist items) → tap circle (1/6) → sample agreement → Check (6 findings, lawyer packet link); undo circle → 0/6. Scripted run took 15 s |
 | Browser 390×844 | no horizontal overflow; checklist shown above the steps once built |
 
-Tested locally only. Not deployed.
+This entry recorded local validation before deployment; see the live verification below.
+
+### Lex PR #7 and Render preview — 2026-09-26
+
+- Resolved the duplicated Hoplite commit history by merging current Lex `main` into PR #7 while keeping the tested one-page workspace tree. PR #7 merged as `3886943`; `main` and Render's `feat/complete-product` branch were advanced together.
+- GitHub CI passed with its database-backed checks. Local `pnpm build` and `pnpm lint` passed; local `pnpm test` passed 26 tests and skipped 30 database tests because `PG_ADMIN_URL` was not set.
+- Render reported a successful deployment of `3886943`. A fresh-browser run at `https://lex-company-counsel.onrender.com/` created Clex Demo Bakery through **Click demo answers**, picked and saved 20/20 answers (one Not sure), generated six checklist items, marked one complete, and checked the synthetic flour agreement. The workspace showed six findings and a lawyer-packet link. This run used a fresh browser session and did not alter an existing user's trial company.
