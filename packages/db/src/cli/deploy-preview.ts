@@ -9,10 +9,14 @@ if (process.env.APP_ENV !== "preview") {
 }
 
 const adminConnection = process.env.DATABASE_URL;
-const appConnection = process.env.APP_DATABASE_URL;
-if (!adminConnection || !appConnection) {
-  throw new Error("DATABASE_URL and APP_DATABASE_URL are required");
+if (!adminConnection) {
+  throw new Error("DATABASE_URL is required");
 }
+
+const generatedAppUrl = new URL(adminConnection);
+generatedAppUrl.username = "lex_app";
+generatedAppUrl.password = process.env.LEX_APP_PASSWORD ?? "";
+const appConnection = process.env.APP_DATABASE_URL ?? generatedAppUrl.toString();
 
 const adminUrl = new URL(adminConnection);
 const appUrl = new URL(appConnection);
