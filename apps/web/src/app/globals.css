@@ -1,4 +1,3 @@
-/* Hallmark · statement-led split hero and living document scene · StudyMate and The Bridge studied DNA · editorial/atmospheric · evergreen and mint · pre-emit critique: P4 H5 E4 S5 R4 V4 */
 @import "tailwindcss";
 @import "./tokens.css";
 
@@ -30,24 +29,21 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-footer { max-width: 76rem; margin-inline: auto; padding: 1.5rem clamp(1rem, 4vw, 2.5rem) 2.5rem; border-top: 1px solid var(--color-rule); color: var(--color-ink-2); font-size: .75rem; line-height: 1.5; }
 
 .clex-hero { position: relative; isolation: isolate; overflow: hidden; min-height: 520px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: clamp(1rem, 4vw, 4rem); border-radius: 2rem; background: var(--color-forest-deep); color: var(--color-paper); padding: clamp(1.6rem, 4vw, 3.5rem); }
-.clex-hero::before { content: ""; position: absolute; inset: -35%; z-index: -1; background: radial-gradient(circle at 73% 43%, color-mix(in srgb, var(--color-mint) 18%, transparent), transparent 28%), radial-gradient(circle at 15% 92%, color-mix(in srgb, var(--color-coral) 12%, transparent), transparent 25%); }
 .clex-hero-copy { position: relative; z-index: 2; min-width: 0; animation: clex-enter var(--dur-medium) var(--ease-out) both; }
-.clex-hero-kicker { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid color-mix(in srgb, var(--color-mint) 45%, transparent); border-radius: var(--radius-pill); padding: .5rem .8rem; color: var(--color-mint); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-.clex-hero-kicker::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--color-mint); }
+.clex-hero-kicker { display: inline-block; color: var(--color-mint); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .clex-hero-title { max-width: 14ch; margin-top: var(--space-lg); font-family: var(--font-display); font-size: clamp(2.9rem, 4.8vw, 4.8rem); font-weight: 400; line-height: .98; letter-spacing: -.06em; overflow-wrap: anywhere; }
 .clex-hero-title em { color: var(--color-mint); font-weight: 400; }
 .clex-hero-sub { max-width: 31rem; margin-top: var(--space-lg); color: color-mix(in srgb, var(--color-paper) 83%, transparent); font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.55; }
-.clex-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: var(--space-lg); }
-.clex-demo-button { min-height: 3.25rem; border-radius: var(--radius-pill); background: var(--color-mint); color: var(--color-forest-deep); padding: .8rem 1.35rem; font-size: .9rem; font-weight: 800; white-space: nowrap; transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out); }
-.clex-demo-button:hover { transform: translateY(-3px); }
-.clex-demo-button:active, .button-primary:active, .button-secondary:active { transform: translateY(1px); }
-.clex-demo-button:disabled { opacity: .7; }
-.clex-hero-secondary { min-height: 3.25rem; display: inline-flex; align-items: center; border: 1px solid color-mix(in srgb, var(--color-paper) 65%, transparent); border-radius: var(--radius-pill); padding: .8rem 1.25rem; font-size: .9rem; font-weight: 700; white-space: nowrap; }
+.clex-hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: .7rem; margin-top: var(--space-lg); }
+.clex-hero-primary { display: inline-flex; align-items: center; justify-content: center; min-width: 15rem; min-height: 3.25rem; border-radius: var(--radius-pill); background: var(--color-mint); color: var(--color-forest-deep); padding: .8rem 1.35rem; font-size: .9rem; font-weight: 800; white-space: nowrap; transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out); }
+.clex-hero-primary:hover { transform: translateY(-3px); }
+.clex-hero-primary:active, .button-primary:active, .button-secondary:active { transform: translateY(1px); }
+.clex-hero-secondary { min-height: 3rem; min-width: 15rem; display: inline-flex; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--color-paper) 55%, transparent); border-radius: var(--radius-pill); padding: .7rem 1.25rem; font-size: .88rem; font-weight: 700; white-space: nowrap; transition: background var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+.clex-hero-secondary:hover { border-color: var(--color-mint); background: color-mix(in srgb, var(--color-mint) 10%, transparent); }
+.clex-hero-hint { max-width: 27rem; color: color-mix(in srgb, var(--color-paper) 70%, transparent); font-size: .78rem; line-height: 1.5; }
 .clex-hero-proof { display: flex; flex-wrap: wrap; gap: .6rem 1.2rem; margin-top: var(--space-lg); color: color-mix(in srgb, var(--color-paper) 66%, transparent); font-size: .72rem; }
 .clex-hero-proof span::before { content: "✓"; color: var(--color-mint); margin-right: .4rem; }
 .clex-scene { position: relative; min-width: 0; height: clamp(340px, 44vw, 560px); perspective: 900px; }
-.clex-scene-orbit { position: absolute; inset: 4% 1%; border: 1px solid color-mix(in srgb, var(--color-mint) 25%, transparent); border-radius: 50%; transform: rotate(-22deg); animation: clex-orbit 28s linear infinite; }
-.clex-scene-orbit::after { content: ""; position: absolute; top: 13%; left: 13%; width: .55rem; height: .55rem; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 18px var(--color-gold); }
 .clex-scene-sheet { position: absolute; width: 70%; min-height: 65%; border: 1px solid color-mix(in srgb, var(--color-paper) 30%, transparent); border-radius: 1.3rem; background: var(--color-surface); color: var(--color-ink); box-shadow: 0 30px 60px color-mix(in srgb, var(--color-forest-deep) 45%, transparent); padding: clamp(1rem, 2vw, 1.8rem); }
 .clex-scene-sheet-back { top: 17%; left: 14%; transform: rotate(-12deg) translateZ(-80px); opacity: .7; }
 .clex-scene-sheet-front { top: 12%; right: 3%; transform: rotate(7deg); animation: clex-paper 7s ease-in-out infinite alternate; }
@@ -57,7 +53,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-scene-tag { color: var(--color-focus); font-size: .66rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
 .clex-scene-heading { margin-top: 1rem; font-family: var(--font-display); font-size: clamp(1.1rem, 2vw, 1.7rem); line-height: 1.1; }
 .clex-scene-highlight { margin-top: 1.2rem; border-left: 3px solid var(--color-coral); background: var(--color-paper); padding: .75rem; font-size: .78rem; line-height: 1.45; }
-.clex-scene-badge { position: absolute; right: 1%; bottom: 3%; max-width: 13rem; border-radius: 1rem; background: var(--color-mint); color: var(--color-forest-deep); padding: .85rem 1rem; font-size: .8rem; font-weight: 750; box-shadow: 0 15px 30px color-mix(in srgb, var(--color-forest-deep) 30%, transparent); animation: clex-bob 5s ease-in-out infinite alternate; }
+.clex-scene-badge { position: absolute; right: 2%; bottom: 6%; max-width: 14rem; border-left: 4px solid var(--color-coral); border-radius: .4rem; background: var(--color-gold); color: var(--color-forest-deep); padding: .8rem 1rem; font-size: .82rem; font-weight: 700; line-height: 1.35; transform: rotate(-2deg); box-shadow: 0 14px 26px color-mix(in srgb, var(--color-forest-deep) 30%, transparent); }
+.clex-scene-badge span { display: block; margin-bottom: .25rem; font-size: .62rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; opacity: .75; }
 .clex-scene-character { position: absolute; width: clamp(125px, 13vw, 170px); height: auto; left: -5%; bottom: 28%; transform: rotate(-8deg); filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--color-forest-deep) 40%, transparent)); animation: clex-mascot-bob 5s ease-in-out infinite alternate; }
 
 .clex-section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.3rem; }
@@ -86,10 +83,66 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-overview-title { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 4.25rem); font-weight: 400; letter-spacing: -.06em; line-height: 1.05; overflow-wrap: anywhere; }
 .clex-status-pill { display: inline-block; margin-top: .6rem; border: 1px solid var(--color-rule); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--color-ink-2); font-size: .75rem; font-weight: 700; }
 
+/* App pages: page head, start form, intake */
+.clex-breadcrumb { color: var(--color-ink-2); font-size: .82rem; }
+.clex-breadcrumb a { font-weight: 700; color: var(--color-focus); }
+.clex-breadcrumb a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.clex-page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem; }
+.clex-page-head > div:first-child { min-width: 0; flex: 1 1 22rem; }
+.clex-page-title { margin-top: .4rem; font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.05; }
+.clex-page-sub { margin-top: .6rem; max-width: 40rem; color: var(--color-ink-2); font-size: .9rem; line-height: 1.55; }
+.clex-page-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.clex-progress { max-width: 28rem; height: .45rem; margin-top: .9rem; overflow: hidden; border-radius: var(--radius-pill); background: var(--color-paper-2); }
+.clex-progress span { display: block; height: 100%; border-radius: inherit; background: var(--color-focus); transition: width var(--dur-medium) var(--ease-out); }
+.clex-note { border-left: 3px solid var(--color-coral); border-radius: .5rem; background: var(--color-surface); padding: .9rem 1rem; color: var(--color-ink-2); font-size: .86rem; line-height: 1.55; }
+.clex-alert { border: 1px solid #e7b4a3; border-radius: .7rem; background: #fbeee9; padding: .7rem .9rem; color: #8a3419; font-size: .86rem; }
+.clex-link { color: var(--color-focus); font-size: .84rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.clex-field-label { display: block; margin-bottom: .45rem; font-size: .86rem; font-weight: 750; }
+
+.clex-start { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 28rem); align-items: start; gap: clamp(1.5rem, 5vw, 4rem); max-width: 62rem; margin-inline: auto; padding-top: clamp(0rem, 3vw, 2rem); }
+.clex-start-art { width: clamp(7rem, 14vw, 10rem); height: auto; margin-top: 1.5rem; }
+.clex-start-form { display: grid; gap: 1.4rem; padding: clamp(1.2rem, 3vw, 2rem); }
+.clex-stage-list { display: grid; gap: .5rem; }
+.clex-stage { display: flex; align-items: center; gap: .7rem; border: 1px solid var(--color-rule); border-radius: .8rem; background: var(--color-white); padding: .75rem .9rem; font-size: .88rem; cursor: pointer; transition: border-color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out); }
+.clex-stage:hover { border-color: var(--color-focus); }
+.clex-stage:has(:checked) { border-color: var(--color-focus); background: var(--color-mint-soft); font-weight: 700; }
+.clex-stage input { accent-color: var(--color-focus); }
+
+.clex-demo-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 1.5rem; border: 1px solid color-mix(in srgb, var(--color-gold) 80%, var(--color-coral)); border-radius: var(--radius-card); background: color-mix(in srgb, var(--color-gold) 28%, var(--color-surface)); padding: 1rem 1.25rem; }
+.clex-demo-banner > div:first-child { min-width: 0; flex: 1 1 20rem; }
+.clex-demo-banner p { margin-top: .25rem; color: var(--color-ink-2); font-size: .85rem; line-height: 1.5; }
+.clex-demo-banner-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .9rem; }
+.clex-intake-group { border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-surface); padding: .5rem clamp(1rem, 2.5vw, 1.6rem) 1rem; }
+.clex-intake-group legend { padding: 0 .5rem; margin-left: -.5rem; font-family: var(--font-display); font-size: 1.3rem; }
+.clex-question { display: grid; gap: .6rem; padding: 1.1rem 0; border-top: 1px solid var(--color-paper-2); }
+.clex-question:first-of-type { border-top: 0; }
+.clex-question-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .4rem 1rem; }
+.clex-question-prompt { min-width: 0; flex: 1 1 18rem; font-size: .93rem; font-weight: 750; line-height: 1.4; }
+.clex-question-help { color: var(--color-ink-2); font-size: .8rem; line-height: 1.5; }
+.clex-state-pill { border-radius: var(--radius-pill); background: var(--color-mint-soft); padding: .2rem .6rem; color: var(--color-focus); font-size: .7rem; font-weight: 750; }
+.clex-state-pill.is-missing { background: var(--color-paper-2); color: var(--color-ink-2); }
+.clex-question-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.clex-question-input { flex: 1 1 16rem; width: auto; min-width: 0; }
+.clex-options { display: flex; flex-wrap: wrap; gap: .45rem; flex: 1 1 auto; }
+.clex-option { position: relative; display: inline-flex; cursor: pointer; }
+.clex-option input { position: absolute; opacity: 0; pointer-events: none; }
+.clex-option span { border: 1px solid var(--color-rule); border-radius: var(--radius-pill); background: var(--color-white); padding: .5rem .9rem; font-size: .84rem; transition: border-color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out); }
+.clex-option:hover span { border-color: var(--color-focus); }
+.clex-option input:checked + span { border-color: var(--color-forest); background: var(--color-forest); color: var(--color-white); font-weight: 700; }
+.clex-option input:focus-visible + span { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.clex-question-toggles { display: flex; gap: .4rem; margin-left: auto; }
+.clex-toggle { border: 1px dashed var(--color-rule); border-radius: var(--radius-pill); padding: .45rem .8rem; color: var(--color-ink-2); font-size: .78rem; font-weight: 700; }
+.clex-toggle:hover { border-color: var(--color-ink-2); }
+.clex-toggle[aria-pressed="true"] { border-style: solid; border-color: var(--color-ink-2); background: var(--color-paper-2); color: var(--color-ink); }
+.clex-toggle.is-unknown[aria-pressed="true"] { border-color: var(--color-coral); background: #f8e4db; color: #7a3a22; }
+.clex-demo-chip { justify-self: start; display: inline-flex; align-items: center; gap: .55rem; max-width: 100%; border: 1px dashed color-mix(in srgb, var(--color-coral) 70%, var(--color-gold)); border-radius: var(--radius-pill); background: color-mix(in srgb, var(--color-gold) 22%, var(--color-surface)); padding: .35rem .85rem .35rem .4rem; color: var(--color-ink); font-size: .8rem; text-align: left; transition: background var(--dur-short) var(--ease-out); }
+.clex-demo-chip:hover { background: color-mix(in srgb, var(--color-gold) 45%, var(--color-surface)); }
+.clex-demo-chip[aria-pressed="true"] { border-style: solid; border-color: var(--color-focus); background: var(--color-mint-soft); }
+.clex-demo-chip-tag { flex: none; border-radius: var(--radius-pill); background: var(--color-forest-deep); padding: .15rem .5rem; color: var(--color-gold); font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.clex-savebar { position: sticky; bottom: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; border-top: 1px solid var(--color-rule); background: color-mix(in srgb, var(--color-paper) 94%, transparent); backdrop-filter: blur(6px); padding: .9rem 0; color: var(--color-ink-2); font-size: .82rem; }
+
 @keyframes clex-enter { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes clex-orbit { to { transform: rotate(338deg); } }
 @keyframes clex-paper { to { transform: rotate(5deg) translateY(-10px); } }
-@keyframes clex-bob { to { transform: translateY(-8px); } }
 @keyframes clex-mascot-bob { to { transform: rotate(-8deg) translateY(-8px); } }
 
 @media (max-width: 800px) {
@@ -99,6 +152,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
   .clex-scene-sheet { width: 58%; min-height: 60%; }
   .clex-scene-character { width: 145px; left: 6%; bottom: -3%; }
   .clex-section-head { align-items: start; flex-direction: column; }
+  .clex-start { grid-template-columns: minmax(0, 1fr); }
+  .clex-start-art { display: none; }
 }
 @media (max-width: 540px) {
   .clex-nav { padding: .7rem 1rem; }
@@ -109,8 +164,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
   .clex-hero { border-radius: 1.4rem; padding: 1.5rem 1.2rem 0; }
   .clex-hero-title { margin-top: 1.7rem; font-size: clamp(2.8rem, 13vw, 4.2rem); }
   .clex-hero-sub { margin-top: 1.3rem; }
-  .clex-hero-actions { align-items: stretch; flex-direction: column; }
-  .clex-demo-button, .clex-hero-secondary { width: 100%; justify-content: center; }
+  .clex-hero-actions { align-items: stretch; }
+  .clex-hero-primary, .clex-hero-secondary { width: 100%; min-width: 0; }
   .clex-hero-proof { margin-top: 1.3rem; }
   .clex-scene { height: 265px; margin-top: .5rem; }
   .clex-scene-sheet { width: 62%; min-height: 59%; padding: .8rem; }
@@ -126,8 +181,10 @@ a, button { -webkit-tap-highlight-color: transparent; }
   .clexa-guide-art { width: 3.8rem; }
   .clexa-guide-action { width: 100%; }
   .clexa-guide-action .button-primary { width: 100%; }
+  .clex-question-toggles { margin-left: 0; }
+  .clex-savebar .button-primary { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .clex-hero::before, .clex-hero-copy, .clex-scene-orbit, .clex-scene-sheet-front, .clex-scene-badge, .clex-scene-character { animation: none !important; }
-  .button-primary, .button-secondary, .clex-demo-button, .clex-company-card { transition-duration: 100ms; }
+  .clex-hero-copy, .clex-scene-sheet-front, .clex-scene-character { animation: none !important; }
+  .button-primary, .button-secondary, .clex-hero-primary, .clex-hero-secondary, .clex-company-card { transition-duration: 100ms; }
 }

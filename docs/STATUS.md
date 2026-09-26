@@ -166,3 +166,17 @@ State left in the local demo database: GB formation starter v1 published (by the
 Limitations: draft rules are generic preparation steps citing landing pages only — no jurisdiction-specific sources, employment or supplier packs, or templates yet (`reviewed_template` capability schema exists but no template content); source versions store locators/permitted excerpts, not snapshots; evaluation cases live in the manifests rather than a reviewer-editable UI; no email notification to reviewers on stale/review-due; publish UI is functional but minimal (no diff view between versions).
 
 Next task: M3 Documents and model path (private uploads, constrained parser, spans, queue jobs, provider adapter, evidence validation).
+
+### UI refresh: Try it out + demo answers — 2026-09-26
+
+- Removed the one-click synthetic demo (`POST /api/demo`, `StartDemoButton`). The landing hero now has **Try it out** (`/companies/new`) with **Click demo answers** (`/companies/new?demo=1`) under it.
+- Demo answers mode: the new-company form prefills "Clex Demo Bakery" and goes to `/companies/:id/profile?demo=1`. Each intake question shows a clickable demo answer (`apps/web/src/lib/demo-answers.ts`), with **Pick all demo answers** for unanswered questions. Nothing is saved until the user confirms, which creates a normal profile revision. The profile page offers the same toggle to any company.
+- Removed the AI-style decoration (hero glows, orbit, sparkle badge, "Clexa found…" copy). Colours, tokens and Clexa are unchanged. Restyled the new-company, profile and intake pages with Clex tokens: pill choices instead of selects, state pills, a progress bar and a sticky save bar.
+
+| Command | Outcome |
+|---|---|
+| `pnpm typecheck` / `pnpm --filter @lex/web lint` | pass / 0 problems |
+| `pnpm test` | 11 files, 56/56 pass |
+| Browser (1440×900, 390×844) | landing → Click demo answers → create → Pick all → save → revision 1 (18 answers); adaptive follow-ups show demo answers → revision 2, 20/20, 1 Not sure; no horizontal overflow on mobile |
+
+Tested locally only. Not deployed.
