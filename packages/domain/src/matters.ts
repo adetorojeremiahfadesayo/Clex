@@ -17,6 +17,8 @@ export const createMatterSchema = z.object({
     dataAccess: z.string().trim().max(300).optional(),
     deliverables: z.string().trim().max(1000).optional(),
     question: z.string().trim().max(4000).optional(),
+    /** "Run your company" module this matter belongs to. */
+    topic: z.string().trim().max(40).optional(),
   }).default({}),
 });
 export type CreateMatterInput = z.infer<typeof createMatterSchema>;

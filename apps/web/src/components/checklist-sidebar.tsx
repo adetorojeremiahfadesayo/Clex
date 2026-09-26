@@ -81,7 +81,7 @@ export function ChecklistSidebar({ companyId, items, canEdit, hasProfile, notice
         <div className="clex-ring" style={{ ["--pct" as string]: `${Math.round(pct * 360)}deg` }} aria-hidden="true"><span>{done}/{view.length}</span></div>
         <div>
           <p className="eyebrow">Your checklist</p>
-          <p className="clex-side-sub">{!hasProfile ? "Appears after you save your answers." : done === view.length && view.length ? "All steps done. Nice work." : "Tap a circle when a step is done."}</p>
+          <p className="clex-side-sub">{!hasProfile ? "Appears after you save your answers." : done === view.length && view.length ? "All done! Your registration pack is ready." : "Tap a circle when a step is done."}</p>
         </div>
       </div>
       {!hasProfile ? (
@@ -115,7 +115,7 @@ export function ChecklistSidebar({ companyId, items, canEdit, hasProfile, notice
       {error && <p role="alert" className="clex-alert mt-3">{error}</p>}
       {hasProfile && (
         <div className="clex-side-foot">
-          <a href={`/api/v1/companies/${companyId}/exports/brief`} target="_blank" rel="noopener">Preparation brief ↗</a>
+          <Link href={`/companies/${companyId}/registration`} className={done === view.length && view.length ? "button-primary w-full" : "button-light w-full"}>Get my registration pack →</Link>
           <Link href={`/companies/${companyId}/checklist`}>Skip, block or add evidence</Link>
           <p>{notice}</p>
         </div>

@@ -202,3 +202,24 @@ This entry recorded local validation before deployment; see the live verificatio
 - Resolved the duplicated Hoplite commit history by merging current Lex `main` into PR #7 while keeping the tested one-page workspace tree. PR #7 merged as `3886943`; `main` and Render's `feat/complete-product` branch were advanced together.
 - GitHub CI passed with its database-backed checks. Local `pnpm build` and `pnpm lint` passed; local `pnpm test` passed 26 tests and skipped 30 database tests because `PG_ADMIN_URL` was not set.
 - Render reported a successful deployment of `3886943`. A fresh-browser run at `https://lex-company-counsel.onrender.com/` created Clex Demo Bakery through **Click demo answers**, picked and saved 20/20 answers (one Not sure), generated six checklist items, marked one complete, and checked the synthetic flour agreement. The workspace showed six findings and a lawyer-packet link. This run used a fresh browser session and did not alter an existing user's trial company.
+
+### Full journey and UI overhaul — 2026-09-26
+
+User feedback: the progression got stuck, there was no payoff after the checklist, and the user wanted a downloadable pack, a post-registration hub with agent workflows, and a new visual direction (Notion, Raycast and Comp AI references).
+
+- Fixed: on short viewports the sticky save bar covered "Pick all demo answers", so a tap landed on Save with nothing picked. The intake is now a step-by-step wizard (one group per screen, Back/Next, then Review, then Save). The sticky bar is gone.
+- Journey: Answers → Checklist (tap-to-complete sidebar) → **Registration pack** (`/companies/:id/registration`: PDF download via `GET /api/v1/companies/:id/exports/registration-pack` built with pdf-lib, success screen with confetti, optional "I'm registered" which saves `registration_status` and `registration_number` as a founder-confirmed profile revision) → **Run your company** (`/companies/:id/run`, 7 module cards).
+- Agent workspace (`/companies/:id/matters/:matterId`): sources (document upload, Slack/Gmail conversation import by paste or export file, synthetic demo samples), a chat agent (`POST …/matters/:matterId/agent`) with browser voice input and read-aloud (Web Speech API, shown only when supported), and an editable draft (save new version, download .txt, copy). Local mode compares conversations against documents (numbers and places) and runs the existing clause checks. It quotes only supplied text, saves findings as a matter analysis and saves letters as a matter draft. Live mode uses the configured provider with schema and quote validation. Failures return an error with no canned output.
+- Not implemented: OAuth Slack/Gmail connectors (they need app credentials; the UI says so and offers import instead). The chat transcript itself is not persisted; findings and drafts are.
+
+| Command | Outcome |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` | pass / 0 problems |
+| `pnpm test` (with `scripts/dev-env.sh`) | 12 files, 60/60 pass (new `apps/web/test/agent.test.ts`) |
+| `pnpm --filter @lex/web build` | compiled successfully |
+| Browser 1440×900 | landing → demo → pick all → save (6 items) → 6/6 → pack page → PDF 200 `application/pdf` → success → registered → hub (7 cards) → Contracts → sample Slack + document → 2 mismatch findings + letter to "Demo Flour Co" |
+| Browser 1280×577 | wizard pick all + save works (the previous blocker) |
+| Browser 390×844 | workspace, pack, hub and agent fit the viewport |
+| PDF | 2 pages, rendered and inspected |
+
+Tested locally only at the time of this entry. Deployment status is recorded below after integration.
