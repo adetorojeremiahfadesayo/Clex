@@ -31,3 +31,19 @@ export const demoAnswers: Partial<Record<FactKey, string>> = {
   has_adviser: "no",
   current_priority: "Review a flour supply agreement before signing",
 };
+
+/** Synthetic agreement whose terms deliberately differ from the demo company's intended deal. */
+export const sampleAgreement = {
+  counterparty: "Demo Flour Co",
+  intendedPayment: "Net 30 days after accepted delivery",
+  text: `SYNTHETIC SAMPLE — NOT A REAL AGREEMENT
+
+Flour supply agreement between Demo Flour Co and Clex Demo Bakery.
+
+1. Deliverables. Demo Flour Co will deliver 200kg of flour every Monday.
+2. Payment. Payment is due within 7 days of invoice.
+3. Termination. Either party may terminate on 30 days' notice.
+4. Limitation of liability. The supplier's total liability is capped at the fees paid in the previous month.
+5. Governing law. This agreement is governed by the law of England and Wales.
+`,
+};

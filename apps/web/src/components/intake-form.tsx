@@ -2,45 +2,44 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-import type { IntakeGroup } from "@lex/domain";
+import { useMemo, useState, type FormEvent } from "react";
+import { type FactKey, type FactMap, type IntakeGroup, type RecordedFact, answeredString, factState, intakeGroupLabels, intakeQuestions, intakeViews } from "@lex/domain";
 import { DEMO_UNKNOWN, demoAnswers } from "@/lib/demo-answers";
-
-export interface IntakeQuestionView {
-  key: string;
-  group: IntakeGroup;
-  prompt: string;
-  help?: string | undefined;
-  kind: "choice" | "text" | "number";
-  options?: { value: string; label: string }[] | undefined;
-  allowUnknown: boolean;
-  allowSkip: boolean;
-  state: "answered" | "unknown" | "skipped" | "missing";
-  current: string | undefined;
-}
 
 type Answer = { state: "answered"; value: string | number } | { state: "unknown" } | { state: "skipped" };
 type Mode = "answer" | "unknown" | "skipped" | "";
+type View = ReturnType<typeof intakeViews>[number];
 
-export function IntakeForm({
-  companyId,
-  currentVersion,
-  groups,
-  demoMode = false,
-}: {
+/** Overlays unsaved picks so follow-up questions appear before the first save. */
+function withPicks(facts: FactMap, values: Record<string, string>, modes: Record<string, Mode>): FactMap {
+  const merged: FactMap = { ...facts };
+  for (const q of intakeQuestions) {
+    const mode = modes[q.key];
+    if (!mode) continue;
+    const raw = (values[q.key] ?? "").trim();
+    const value = mode === "answer" ? (raw ? { state: "answered" as const, value: q.kind === "number" ? Number(raw) : raw } : null) : { state: mode };
+    if (value) merged[q.key] = { value, provenance: "user_asserted", recordedAt: "", recordedBy: "", sourceDocumentVersionId: null } as RecordedFact;
+  }
+  return merged;
+}
+
+export function IntakeForm({ companyId, currentVersion, facts, demoMode = false }: {
   companyId: string;
   currentVersion: number;
-  groups: { group: IntakeGroup; label: string; questions: IntakeQuestionView[] }[];
+  facts: FactMap;
   demoMode?: boolean;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const questions = groups.flatMap((g) => g.questions);
-  const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(questions.map((q) => [q.key, q.current ?? ""])));
+  const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(intakeQuestions.map((q) => [q.key, answeredString(facts, q.key) ?? ""])));
   // Existing answers remain visible, but only explicit edits belong in this revision.
   const [modes, setModes] = useState<Record<string, Mode>>({});
-  const touched = Object.values(modes).filter(Boolean).length;
+  const views = useMemo(() => intakeViews(withPicks(facts, values, modes)), [facts, values, modes]);
+  const touched = views.filter((v) => modes[v.question.key]).length;
+  const groups = (Object.keys(intakeGroupLabels) as IntakeGroup[])
+    .map((group) => ({ group, label: intakeGroupLabels[group], views: views.filter((v) => v.question.group === group) }))
+    .filter((g) => g.views.length > 0);
 
   function setValue(key: string, value: string) {
     setValues((v) => ({ ...v, [key]: value }));
@@ -49,14 +48,15 @@ export function IntakeForm({
   function toggleMode(key: string, mode: "unknown" | "skipped") {
     setModes((m) => ({ ...m, [key]: m[key] === mode ? "" : mode }));
   }
-  function pickDemo(q: IntakeQuestionView) {
-    const demo = demoAnswers[q.key as keyof typeof demoAnswers];
+  function pickDemo(key: FactKey) {
+    const demo = demoAnswers[key];
     if (demo === undefined) return;
-    if (demo === DEMO_UNKNOWN) setModes((m) => ({ ...m, [q.key]: "unknown" }));
-    else setValue(q.key, demo);
+    if (demo === DEMO_UNKNOWN) setModes((m) => ({ ...m, [key]: "unknown" }));
+    else setValue(key, demo);
   }
   function fillAllDemo() {
-    for (const q of questions) if (q.state === "missing") pickDemo(q);
+    // Includes follow-ups that only apply once earlier demo answers are picked.
+    for (const q of intakeQuestions) if (factState(facts, q.key) === "missing") pickDemo(q.key);
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -64,14 +64,13 @@ export function IntakeForm({
     setPending(true);
     setError(null);
     const answers: Record<string, Answer> = {};
-    for (const q of questions) {
+    for (const { question: q } of views) {
       const mode = modes[q.key];
       if (mode === "unknown") answers[q.key] = { state: "unknown" };
       else if (mode === "skipped") answers[q.key] = { state: "skipped" };
       else if (mode === "answer") {
         const raw = (values[q.key] ?? "").trim();
-        if (!raw) continue;
-        answers[q.key] = { state: "answered", value: q.kind === "number" ? Number(raw) : raw };
+        if (raw) answers[q.key] = { state: "answered", value: q.kind === "number" ? Number(raw) : raw };
       }
     }
     if (Object.keys(answers).length === 0) {
@@ -90,57 +89,52 @@ export function IntakeForm({
       setError(data?.error?.message ?? "Could not save answers");
       return;
     }
+    router.replace(`/companies/${companyId}/overview${demoMode ? "?demo=1" : ""}`, { scroll: false });
     router.refresh();
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-5">
       {demoMode && (
         <div className="clex-demo-banner" role="region" aria-label="Demo answers">
           <div>
-            <strong>Demo answers are on.</strong>
-            <p>Each question shows a sample answer for a synthetic Lagos bakery. Click it to pick it, or choose a different answer yourself. Nothing is saved until you confirm.</p>
+            <strong>Demo answers are on</strong>
+            <p>Every question has a gold tag with a sample answer for a Lagos bakery. Tap it to pick, or choose your own answer. Nothing is saved until you confirm.</p>
           </div>
-          <div className="clex-demo-banner-actions">
-            <button type="button" className="button-primary" onClick={fillAllDemo}>Pick all demo answers</button>
-            <Link href="?" className="clex-link">Hide demo answers</Link>
-          </div>
+          <button type="button" className="button-primary" onClick={fillAllDemo}>Pick all demo answers</button>
         </div>
       )}
       {groups.map((g) => (
         <fieldset key={g.group} className="clex-intake-group">
           <legend>{g.label}</legend>
-          {g.questions.map((q) => (
+          {g.views.map((v) => (
             <Question
-              key={q.key}
-              q={q}
-              value={values[q.key] ?? ""}
-              mode={modes[q.key] ?? ""}
-              onValue={(v) => setValue(q.key, v)}
-              onToggle={(m) => toggleMode(q.key, m)}
-              demo={demoMode ? demoAnswers[q.key as keyof typeof demoAnswers] : undefined}
-              onPickDemo={() => pickDemo(q)}
+              key={v.question.key}
+              view={v}
+              saved={factState(facts, v.question.key)}
+              value={values[v.question.key] ?? ""}
+              mode={modes[v.question.key] ?? ""}
+              onValue={(val) => setValue(v.question.key, val)}
+              onToggle={(m) => toggleMode(v.question.key, m)}
+              demo={demoMode ? demoAnswers[v.question.key] : undefined}
+              onPickDemo={() => pickDemo(v.question.key)}
             />
           ))}
         </fieldset>
       ))}
-      {error && (
-        <p role="alert" className="clex-alert">{error}</p>
-      )}
+      {error && <p role="alert" className="clex-alert">{error}</p>}
       <div className="clex-savebar">
-        <button type="submit" disabled={pending} className="button-primary">
-          {pending ? "Saving…" : "Save and confirm answers"}
-        </button>
-        <span>
-          Saving creates profile revision {currentVersion + 1}. Only questions you touch are recorded{touched ? ` (${touched} selected)` : ""}.
-        </span>
+        <button type="submit" disabled={pending} className="button-primary">{pending ? "Saving…" : "Save and build my checklist"}</button>
+        <span>{touched ? `${touched} answer${touched === 1 ? "" : "s"} ready.` : "Pick answers above."} Saving creates profile revision {currentVersion + 1}.</span>
+        {!demoMode && <Link href="?demo=1&edit=1#profile" scroll={false} className="clex-link">Show demo answers</Link>}
       </div>
     </form>
   );
 }
 
-function Question({ q, value, mode, onValue, onToggle, demo, onPickDemo }: {
-  q: IntakeQuestionView;
+function Question({ view, saved, value, mode, onValue, onToggle, demo, onPickDemo }: {
+  view: View;
+  saved: ReturnType<typeof factState>;
   value: string;
   mode: Mode;
   onValue: (value: string) => void;
@@ -148,18 +142,19 @@ function Question({ q, value, mode, onValue, onToggle, demo, onPickDemo }: {
   demo: string | undefined;
   onPickDemo: () => void;
 }) {
+  const q = view.question;
   const inputId = `q-${q.key}`;
   const labelId = `${inputId}-label`;
-  const stateLabel = q.state === "answered" ? "Confirmed" : q.state === "unknown" ? "Not sure" : q.state === "skipped" ? "Skipped" : "Not answered";
+  const stateLabel = saved === "answered" ? "Confirmed" : saved === "unknown" ? "Not sure" : saved === "skipped" ? "Skipped" : null;
   const demoLabel = demo === undefined ? undefined : demo === DEMO_UNKNOWN ? "Not sure" : q.options?.find((o) => o.value === demo)?.label ?? demo;
   const demoPicked = demo !== undefined && (demo === DEMO_UNKNOWN ? mode === "unknown" : mode === "answer" && value === demo);
   return (
-    <div className="clex-question">
+    <div className={`clex-question ${mode ? "is-touched" : ""}`}>
       <div className="clex-question-head">
         {q.kind === "choice"
-          ? <span id={labelId} className="clex-question-prompt">{q.prompt}</span>
-          : <label id={labelId} htmlFor={inputId} className="clex-question-prompt">{q.prompt}</label>}
-        <span className={`clex-state-pill ${q.state === "missing" ? "is-missing" : ""}`}>{stateLabel}</span>
+          ? <span id={labelId} className="clex-question-prompt">{view.prompt}</span>
+          : <label id={labelId} htmlFor={inputId} className="clex-question-prompt">{view.prompt}</label>}
+        {stateLabel && <span className="clex-state-pill">{stateLabel}</span>}
       </div>
       {q.help && <p className="clex-question-help">{q.help}</p>}
       <div className="clex-question-controls">
@@ -167,30 +162,18 @@ function Question({ q, value, mode, onValue, onToggle, demo, onPickDemo }: {
           <div role="radiogroup" aria-labelledby={labelId} className="clex-options">
             {q.options?.map((o) => (
               <label key={o.value} className="clex-option">
-                <input type="radio" name={q.key} value={o.value} checked={value === o.value} onChange={() => onValue(o.value)} />
+                <input type="radio" name={q.key} value={o.value} checked={value === o.value && mode !== "unknown" && mode !== "skipped"} onChange={() => onValue(o.value)} />
                 <span>{o.label}</span>
               </label>
             ))}
           </div>
         ) : (
-          <input
-            id={inputId}
-            name={q.key}
-            type={q.kind === "number" ? "number" : "text"}
-            min={q.kind === "number" ? 0 : undefined}
-            value={value}
-            onChange={(e) => onValue(e.target.value)}
-            className="field clex-question-input"
-          />
+          <input id={inputId} name={q.key} type={q.kind === "number" ? "number" : "text"} min={q.kind === "number" ? 0 : undefined} value={value} onChange={(e) => onValue(e.target.value)} className="field clex-question-input" />
         )}
         {(q.allowUnknown || q.allowSkip) && (
           <div className="clex-question-toggles">
-            {q.allowUnknown && (
-              <button type="button" onClick={() => onToggle("unknown")} aria-pressed={mode === "unknown"} className="clex-toggle is-unknown">Not sure</button>
-            )}
-            {q.allowSkip && (
-              <button type="button" onClick={() => onToggle("skipped")} aria-pressed={mode === "skipped"} className="clex-toggle">Skip</button>
-            )}
+            {q.allowUnknown && <button type="button" onClick={() => onToggle("unknown")} aria-pressed={mode === "unknown"} className="clex-toggle is-unknown">Not sure</button>}
+            {q.allowSkip && <button type="button" onClick={() => onToggle("skipped")} aria-pressed={mode === "skipped"} className="clex-toggle">Skip</button>}
           </div>
         )}
       </div>
