@@ -65,10 +65,30 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
     if (demo === DEMO_UNKNOWN) setModes((m) => ({ ...m, [key]: "unknown" }));
     else setValue(key, demo);
   }
-  function fillAllDemo() {
-    // Includes follow-ups that only apply once earlier demo answers are picked.
-    for (const q of intakeQuestions) if (factState(facts, q.key) === "missing") pickDemo(q.key);
-    setStepIndex(Number.MAX_SAFE_INTEGER);
+  function fillPageDemo() {
+    if (!currentGroup) return;
+    const nextValues = { ...values };
+    const nextModes = { ...modes };
+    // Filling one answer can reveal another question on this same page.
+    for (let pass = 0; pass < intakeQuestions.length; pass++) {
+      const pageViews = intakeViews(withPicks(facts, nextValues, nextModes))
+        .filter((view) => view.question.group === currentGroup.group);
+      let changed = false;
+      for (const { question } of pageViews) {
+        if (nextModes[question.key] || factState(facts, question.key) !== "missing") continue;
+        const demo = demoAnswers[question.key];
+        if (demo === undefined) continue;
+        if (demo === DEMO_UNKNOWN) nextModes[question.key] = "unknown";
+        else {
+          nextValues[question.key] = demo;
+          nextModes[question.key] = "answer";
+        }
+        changed = true;
+      }
+      if (!changed) break;
+    }
+    setValues(nextValues);
+    setModes(nextModes);
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -111,9 +131,9 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
         <div className="clex-demo-banner" role="region" aria-label="Demo answers">
           <div>
             <strong>Demo answers are on</strong>
-            <p>Each question has an orange tag with a sample answer for a Lagos bakery. Tap it, or pick every answer at once.</p>
+            <p>Fill this page, read the answers, then press Next when you are ready. You can still pick each orange demo answer separately.</p>
           </div>
-          <button type="button" className="button-primary" onClick={fillAllDemo}>Pick all demo answers →</button>
+          <button type="button" className="button-primary" onClick={fillPageDemo}>Fill this page with demo answers</button>
         </div>
       )}
       <div className="clex-wizard-top">
@@ -149,7 +169,7 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
         <button type="button" className="button-ghost" disabled={stepIndex === 0} onClick={() => setStepIndex(Math.max(0, Math.min(stepIndex, reviewIndex) - 1))}>← Back</button>
         <span className="clex-wizard-count">{touched ? `${touched} answered` : "Nothing picked yet"}</span>
         {onReview
-          ? <button type="submit" disabled={pending || touched === 0} className="button-primary">{pending ? "Saving…" : "Save and build my checklist →"}</button>
+          ? <button type="submit" disabled={pending || touched === 0} className="button-primary">{pending ? "Saving…" : "Save company answers →"}</button>
           : <button type="button" className="button-primary" onClick={() => setStepIndex(stepIndex + 1)}>{stepIndex === reviewIndex - 1 ? "Review answers →" : "Next →"}</button>}
       </div>
       {!demoMode && <p className="clex-wizard-foot">Saving creates profile revision {currentVersion + 1}. <Link href="?demo=1&edit=1#profile" scroll={false} className="clex-link">Show demo answers</Link></p>}
