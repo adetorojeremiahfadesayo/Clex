@@ -8,6 +8,8 @@ The product learns the company's confirmed context, assesses its starting positi
 
 **Judge quick start:** Open the [preview](https://lex-company-counsel.onrender.com/) and click **Explore the live demo**. It creates a persistent synthetic company in your browser's private workspace, with a Nigeria formation profile, starting checklist, sample flour supply agreement, excerpt-based preparation findings, and an editable working draft. Open **Contracts & matters → Flour supply agreement → Open lawyer packet** to see the handoff. Clicking the demo button again in the same browser reuses that sample; another visitor gets a separate copy. Keep browser cookies to retain access. The demo uses local preparation rules, not a live AI model or lawyer-approved legal guidance.
 
+Visual preview: [desktop landing page](docs/screenshots/clex-landing-desktop.png) · [mobile demo workspace](docs/screenshots/clex-demo-mobile.png).
+
 ## Local development
 
 ```bash
