@@ -223,3 +223,9 @@ User feedback: the progression got stuck, there was no payoff after the checklis
 | PDF | 2 pages, rendered and inspected |
 
 Tested locally only at the time of this entry. Deployment status is recorded below after integration.
+
+### Card-agent integration and live preview — 2026-09-26
+
+- Ported Hoplite commit `1b0df52` onto current Lex main, retaining the earlier deployment record in this file. PR #8 passed CI and merged as `ba93e5b`; Render's `feat/complete-product` branch was advanced to the same commit. Render reported deployment success.
+- Local `pnpm install --frozen-lockfile`, `pnpm build`, and `pnpm lint` passed. Local `pnpm test`: 30 passed, 30 database tests skipped without `PG_ADMIN_URL`; GitHub CI passed its database-backed suite.
+- Fresh-browser live check: **Click demo answers** → **Pick all demo answers** → review and save 20 answers → six checklist items → registration-pack PDF downloaded with success screen → **Run your company** displayed seven cards → Contracts card opened its agent → synthetic Slack thread and supplier agreement imported → agent reported the payment and governing-law mismatches and saved editable draft v1. The live agent labelled itself **Local rules · no model configured**. A 390×844 mobile screenshot of the hub and agent source panel was inspected. The test created a separate synthetic company and did not alter an existing trial.
