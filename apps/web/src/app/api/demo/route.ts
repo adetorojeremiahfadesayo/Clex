@@ -5,13 +5,14 @@ import { handle, requireUser } from "@/lib/api";
 import { asActor } from "@/lib/db";
 import { confirmAnswersAndAssess } from "@/lib/company-start";
 import { prepareMatter } from "@/lib/matter-analysis";
+import { env } from "@/lib/env";
 
 const demoName = "LexHack Demo Bakery";
 const sampleAgreement = `SYNTHETIC SAMPLE — NOT A REAL AGREEMENT\n\nDemo Flour Co will deliver flour to LexHack Demo Bakery every Monday. Payment is due within 7 days of invoice. Either party may terminate on 30 days' notice. This agreement is governed by the law of England and Wales.\n`;
 
 /** Each judge receives an isolated, persistent copy. No shared guest session or public tenant ID. */
 export const POST = handle(async (request: Request) => {
-  if (request.headers.get("origin") !== new URL(request.url).origin) {
+  if (request.headers.get("origin") !== new URL(env().APP_URL).origin) {
     return NextResponse.json({ error: { code: "invalid_origin", message: "Open the demo from this site" } }, { status: 403 });
   }
   const user = await requireUser();
