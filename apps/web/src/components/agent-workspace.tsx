@@ -81,6 +81,7 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
       setMessages((m) => [...m, { role: "agent", text: data.reply, findings: data.findings, questions: data.questions, drafted: data.draft?.version, mode: data.mode }]);
       if (data.draft) { setDraftText(data.draft.body); setDraftVersion(data.draft.version); setDraftNote(`Draft v${data.draft.version} saved. Edit it below.`); }
       if (readAloud) voice.speak(data.reply);
+      router.refresh();
       setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 50);
     } catch (e) {
       setMessages((m) => [...m, { role: "agent", text: `Sorry, that didn't work: ${e instanceof Error ? e.message : "unknown error"}` }]);
@@ -92,6 +93,7 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
       const data = await json(`${base}/drafts`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body: draftText }) }) as { draft: { version: number } };
       setDraftVersion(data.draft.version);
       setDraftNote(`Saved as v${data.draft.version}.`);
+      router.refresh();
     } catch (e) { setDraftNote(e instanceof Error ? e.message : "Could not save"); }
     finally { setBusy(null); }
   }

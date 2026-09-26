@@ -8,6 +8,7 @@ import { resolveCompanyForActor } from "@/lib/authz";
 import { asActor } from "@/lib/db";
 import { env } from "@/lib/env";
 import { moduleById } from "@/lib/modules";
+import { moduleViews, statusLabels } from "@/lib/compliance";
 import { currentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ export default async function MatterPage({ params, searchParams }: { params: Pro
   const latest = [...data.analyses].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
   const latestDraft = [...data.drafts].sort((a, b) => b.version - a.version)[0];
   const q = demoMode ? "?demo=1" : "";
+  const view = mod ? moduleViews([{ matter, documents: data.documents, analyses: data.analyses, drafts: data.drafts }], []).find((v) => v.module.id === mod.id) : undefined;
   const sources = data.documents.map((d) => ({ id: d.id, name: d.filename, readable: d.extractionStatus === "readable", type: isConversation(d) ? conversationSource(d) : "Document" }));
 
   return (
@@ -43,8 +45,17 @@ export default async function MatterPage({ params, searchParams }: { params: Pro
           <h1 className="clex-h1">{matter.title}</h1>
           <p className="clex-muted">{mod?.blurb ?? matter.summary}</p>
         </div>
-        <a className="button-secondary" href={`/api/v1/companies/${companyId}/matters/${matterId}/export`} target="_blank" rel="noopener">Open lawyer packet ↗</a>
+        <div className="clex-row">
+          <Link className="button-ghost" href={`/companies/${companyId}/run${q}`}>← Compliance dashboard</Link>
+          <a className="button-secondary" href={`/api/v1/companies/${companyId}/matters/${matterId}/export`} target="_blank" rel="noopener">Open lawyer packet ↗</a>
+        </div>
       </header>
+      {view && (
+        <ol className={`clex-task-strip is-${mod!.accent}`} aria-label={`${mod!.title} tasks`}>
+          <li className={`clex-status is-${view.status}`}>{statusLabels[view.status]}</li>
+          {view.tasks.map((t, i) => <li key={t.label} className={t.done ? "is-done" : ""}><span aria-hidden="true">{t.done ? "✓" : i + 1}</span>{t.label}</li>)}
+        </ol>
+      )}
       <AgentWorkspace
         companyId={companyId}
         matterId={matterId}

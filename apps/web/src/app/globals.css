@@ -330,6 +330,60 @@ button:not(:disabled) { cursor: pointer; }
 .clex-chat .clex-fineprint { color: #8b8d93; }
 .clex-draft { margin-top: .8rem; font-family: var(--font-mono); font-size: .82rem; line-height: 1.6; }
 
+/* Registration phase */
+.clex-form { display: grid; gap: .9rem; }
+.clex-founder-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) 4.5rem 1.8rem; gap: .5rem; align-items: center; }
+.clex-share-total { color: #9a3412; font-size: .8rem; font-weight: 600; }
+.clex-share-total.is-ok { color: var(--color-forest); }
+.clex-side-state { display: block; margin-top: .15rem; color: #6f7278; font-size: .7rem; }
+.clex-side-list li.is-active { background: #1b1c20; box-shadow: inset 2px 0 0 var(--color-gold); }
+.clex-side-list li.is-done .clex-side-state { color: #22c07a; }
+.clex-side-title:disabled { color: #5d6066; cursor: not-allowed; }
+a.clex-side-title:hover, button.clex-side-title:not(:disabled):hover { color: var(--color-mint); }
+
+/* Compliance dashboard */
+.clex-health { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-white); padding: 1.1rem 1.4rem; box-shadow: var(--shadow-sm); }
+.clex-health-score { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+.clex-ring.is-lg { width: 4.6rem; height: 4.6rem; background: conic-gradient(var(--color-forest) var(--pct), var(--color-paper-2) 0); }
+.clex-ring.is-lg span { width: 3.7rem; height: 3.7rem; background: var(--color-white); font-size: 1.05rem; }
+.clex-health-stats { display: flex; flex-wrap: wrap; gap: .5rem; }
+.clex-health-stats li { display: grid; min-width: 6.5rem; border-radius: .75rem; padding: .55rem .8rem; font-size: .76rem; font-weight: 600; }
+.clex-health-stats strong { font-size: 1.35rem; line-height: 1.1; }
+.clex-health-stats .is-in_order, .clex-status.is-in_order { background: var(--color-mint-soft); color: #08694a; }
+.clex-health-stats .is-needs_attention, .clex-status.is-needs_attention { background: var(--color-coral-soft); color: #b3401a; }
+.clex-health-stats .is-in_progress, .clex-status.is-in_progress { background: var(--color-gold-soft); color: #8a6400; }
+.clex-health-stats .is-not_started, .clex-status.is-not_started { background: var(--color-paper-2); color: var(--color-ink-2); }
+.clex-status { display: inline-flex; align-items: center; border-radius: var(--radius-pill); padding: .2rem .6rem; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.clex-module-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+.clex-module-note { border-radius: .6rem; background: var(--color-paper-2); padding: .5rem .65rem; color: var(--color-ink-2); font-size: .78rem; line-height: 1.45; }
+.clex-module-note.is-alert { background: var(--color-coral-soft); color: #9a3412; }
+.clex-module-tasks { display: grid; gap: .3rem; margin-top: .3rem; }
+.clex-module-tasks span { display: flex; align-items: center; gap: .5rem; color: var(--color-ink-2); font-size: .78rem; }
+.clex-module-tasks i { width: .85rem; height: .85rem; flex: none; border: 1.5px solid #c9c9c4; border-radius: 50%; }
+.clex-module-tasks .is-done { color: var(--color-ink); }
+.clex-module-tasks .is-done i { border-color: #22c07a; background: #22c07a radial-gradient(circle, #fff 0 28%, transparent 30%); }
+.clex-module-foot { display: flex; align-items: center; gap: .6rem; }
+.clex-mini-bar { flex: 1; height: .3rem; overflow: hidden; border-radius: var(--radius-pill); background: var(--color-paper-2); }
+.clex-mini-bar span { display: block; height: 100%; background: var(--accent-c); transition: width var(--dur-medium) var(--ease-out); }
+.clex-module .clex-module-tag { top: auto; bottom: 1rem; right: auto; left: 1.3rem; display: none; }
+.clex-module.is-featured .clex-module-top::after { content: "Next"; order: 1; margin-left: auto; margin-right: .4rem; border-radius: var(--radius-pill); background: var(--accent-c); padding: .2rem .55rem; color: #fff; font-size: .68rem; font-weight: 700; }
+.clex-module.is-featured .clex-status { order: 2; }
+.clex-ws-grid .clex-module-grid { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); align-content: start; }
+.clex-cal { display: grid; gap: .35rem; margin-top: .8rem; }
+.clex-cal li { display: flex; align-items: flex-start; gap: .75rem; border-radius: .65rem; padding: .5rem .45rem; }
+.clex-cal li:hover { background: #17181b; }
+.clex-cal-date { display: grid; place-items: center; flex: none; width: 3rem; border-radius: .55rem; background: #1b1c20; padding: .3rem 0; color: #9a9ca2; font-size: .64rem; text-transform: uppercase; box-shadow: inset 0 2px 0 var(--accent-c); }
+.clex-cal-date b { color: var(--color-white); font-size: 1rem; line-height: 1.1; }
+.clex-cal-body { display: grid; min-width: 0; font-size: .82rem; }
+.clex-cal-body strong { font-weight: 500; line-height: 1.35; }
+.clex-cal-body em { margin-top: .15rem; color: #7d8086; font-size: .7rem; font-style: normal; }
+.clex-side-foot-note { margin-top: .9rem; border-top: 1px solid #25272b; padding-top: .8rem; color: #6f7278; font-size: .7rem; line-height: 1.45; }
+.clex-task-strip { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-white); padding: .7rem .8rem; box-shadow: var(--shadow-sm); }
+.clex-task-strip li:not(.clex-status) { display: inline-flex; align-items: center; gap: .45rem; border-radius: var(--radius-pill); background: var(--color-paper-2); padding: .3rem .75rem .3rem .3rem; color: var(--color-ink-2); font-size: .8rem; font-weight: 500; }
+.clex-task-strip li span { display: grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--color-white); font-size: .7rem; font-weight: 700; }
+.clex-task-strip li.is-done { background: var(--color-mint-soft); color: #08694a; }
+.clex-task-strip li.is-done span { background: #22c07a; color: #fff; }
+
 @keyframes clex-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes clex-slide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
 @keyframes clex-mascot-bob { to { transform: translateY(-6px); } }
@@ -357,6 +411,8 @@ button:not(:disabled) { cursor: pointer; }
   .clex-ws-guide { flex-basis: 100%; }
   .clex-ws-mascot { width: 4.4rem; }
   .clex-question-toggles { margin-left: 0; }
+  .clex-founder-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .clex-health-stats li { min-width: 0; flex: 1 1 40%; }
   .clex-wizard-count { display: none; }
   .clex-actions > * { width: 100%; }
   .button-primary, .button-secondary, .button-ghost { white-space: normal; text-align: center; }

@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const steps = [
-  { label: "Answer questions", path: "overview" },
-  { label: "Tick checklist", path: "overview" },
-  { label: "Registration pack", path: "registration" },
-  { label: "Run your company", path: "run" },
+  { label: "Company questions", path: "overview" },
+  { label: "Registration details", path: "overview" },
+  { label: "Pack & certificate", path: "registration" },
+  { label: "Compliance", path: "run" },
 ];
 
 export function JourneySteps({ companyId, step, q = "" }: { companyId: string; step: number; q?: string }) {

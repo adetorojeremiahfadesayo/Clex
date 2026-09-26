@@ -10,3 +10,9 @@ export async function recordAudit(
     [input.companyId, input.actorId, input.action, input.objectType, input.objectId, input.objectVersion ?? null, JSON.stringify(input.summary ?? {})],
   );
 }
+
+/** Whether this company has recorded an audit action (RLS limits reads to members). */
+export async function hasAuditAction(db: Queryable, companyId: string, action: string): Promise<boolean> {
+  const { rows } = await db.query<{ found: boolean }>(`select exists (select 1 from audit_events where company_id = $1 and action = $2) as found`, [companyId, action]);
+  return rows[0]?.found ?? false;
+}

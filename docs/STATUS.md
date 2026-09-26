@@ -229,3 +229,24 @@ Tested locally only at the time of this entry. Deployment status is recorded bel
 - Ported Hoplite commit `1b0df52` onto current Lex main, retaining the earlier deployment record in this file. PR #8 passed CI and merged as `ba93e5b`; Render's `feat/complete-product` branch was advanced to the same commit. Render reported deployment success.
 - Local `pnpm install --frozen-lockfile`, `pnpm build`, and `pnpm lint` passed. Local `pnpm test`: 30 passed, 30 database tests skipped without `PG_ADMIN_URL`; GitHub CI passed its database-backed suite.
 - Fresh-browser live check: **Click demo answers** → **Pick all demo answers** → review and save 20 answers → six checklist items → registration-pack PDF downloaded with success screen → **Run your company** displayed seven cards → Contracts card opened its agent → synthetic Slack thread and supplier agreement imported → agent reported the payment and governing-law mismatches and saved editable draft v1. The live agent labelled itself **Local rules · no model configured**. A 390×844 mobile screenshot of the hub and agent source panel was inspected. The test created a separate synthetic company and did not alter an existing trial.
+
+### Two-phase workflow: registration → compliance — 2026-09-26
+
+User feedback: the checklist only supported manual ticking and mixed registration with running-the-company items. After the pack download, the next phase should be running compliance.
+
+- **Phase 1, Registration** (`/overview`): 7 steps that complete from real actions only. Company questions; proposed names, founders and shares, and registered address (new fact keys `proposed_names`, `founder_details`, `registered_address`, saved as versioned profile revisions); legal form; pack download (derived from the `export.registration_pack` audit event via new `hasAuditAction`); certificate upload (document on a `topic: registration` matter plus `registration_status = registered`). The pack locks until the four details are saved. There is no manual ticking.
+- **Pack PDF** now leads with the registration details, then company facts, lawyer questions, and the compliance areas to set up after registration.
+- **Phase 2, Compliance** (`/run`; registered companies are redirected here): compliance health (% of tasks done), status counts, 7 areas each with 4 tasks derived from real data (document uploaded, conversation imported, agent check run, response drafted). The status is *Needs attention* when the latest agent check has open issues and no newer draft. Starter-rule items (licence, hiring, supplier and data rules) appear as "From your answers" hints on the matching card. The calendar shows placeholder dates at 3, 6, 9 and 12 months from the recorded registration date, plus deadlines quoted from the user's conversations, and is labelled as not legal deadlines.
+- Each area page shows its task strip, which updates after every agent action.
+- The rule-based tap-to-complete sidebar was removed. `/checklist` remains for the legacy transitions.
+
+| Command | Outcome |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` | pass / 0 problems |
+| `pnpm test` (with `scripts/dev-env.sh`) | 13 files, 64/64 pass (new `apps/web/test/workflow.test.ts`) |
+| `pnpm --filter @lex/web build` | compiled successfully |
+| Browser 1440×900 | demo → answers → 2/7 → one form saved (3/7) → fill all demo (5/7) → pack PDF → success → sample certificate → "You're registered!" → dashboard 0%, 7 not started, 6 calendar entries → Contracts: sources + check = Needs attention → draft = In order → dashboard 14% |
+| Browser 390×844 | dashboard, registration and pack pages fit (the only overflow is the fixed confetti canvas) |
+| PDF | 2 pages; registration details section rendered and inspected |
+
+Tested locally only at the time of this entry. Deployment status will be recorded after integration.

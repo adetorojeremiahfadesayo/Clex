@@ -41,6 +41,10 @@ export const factKeys = [
   "online_sales",
   "has_adviser",
   "current_priority",
+  // Registration preparation details (Phase 1 tasks).
+  "proposed_names",
+  "founder_details",
+  "registered_address",
 ] as const;
 export const factKeySchema = z.enum(factKeys);
 export type FactKey = z.infer<typeof factKeySchema>;
