@@ -180,3 +180,19 @@ Next task: M3 Documents and model path (private uploads, constrained parser, spa
 | Browser (1440×900, 390×844) | landing → Click demo answers → create → Pick all → save → revision 1 (18 answers); adaptive follow-ups show demo answers → revision 2, 20/20, 1 Not sure; no horizontal overflow on mobile |
 
 Tested locally only. Not deployed.
+
+### One-page company workspace — 2026-09-26
+
+- `/companies/:id/overview` is now the single workspace: a hero with a progress stepper and Clexa's contextual tip, step 1 (intake questions, which collapse to fact chips once saved), step 2 (contract check: paste or use the sample agreement → creates a supplier matter, uploads the text and runs the existing analysis API; findings, lawyer questions and the lawyer packet appear inline), and a sticky checklist sidebar.
+- Checklist sidebar: tapping a circle walks the item through the allowed founder transitions to `user_completed`, recording evidence "Marked done by the founder from the checklist." Tapping again returns it to `in_progress`. Reviewer-verified items and reviewer role are read-only. Skip, block and evidence options remain on `/checklist`.
+- Intake follow-up questions (region, worker locations) now appear as soon as the answers they depend on are picked, so one save completes the profile. `/profile` redirects into the workspace.
+- The landing **Click demo answers** button creates the demo company directly (shared server action `app/companies/new/actions.ts`); answers are still picked by the user.
+
+| Command | Outcome |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` | pass / 0 problems |
+| `pnpm test` (with `scripts/dev-env.sh`) | 11 files, 56/56 pass |
+| Browser 1440×900 | landing → Click demo answers → Pick all → Save (20/20, 1 Not sure, revision 1, 6 checklist items) → tap circle (1/6) → sample agreement → Check (6 findings, lawyer packet link); undo circle → 0/6. Scripted run took 15 s |
+| Browser 390×844 | no horizontal overflow; checklist shown above the steps once built |
+
+Tested locally only. Not deployed.

@@ -1,24 +1,9 @@
 import { redirect } from "next/navigation";
-import { createCompanyInputSchema, lifecycleStageLabels, lifecycleStages } from "@lex/domain";
-import { createCompanyWithOwner } from "@lex/db";
-import { asActor } from "@/lib/db";
+import { lifecycleStageLabels, lifecycleStages } from "@lex/domain";
 import { currentUser } from "@/lib/session";
 import { demoCompany } from "@/lib/demo-answers";
 import { Clexa } from "@/components/clexa";
-
-async function createCompanyAction(formData: FormData) {
-  "use server";
-  const user = await currentUser();
-  if (!user) redirect("/api/guest?next=/companies/new");
-  const demo = formData.get("demo") === "1";
-  const parsed = createCompanyInputSchema.safeParse({
-    name: formData.get("name"),
-    lifecycleStage: formData.get("lifecycleStage"),
-  });
-  if (!parsed.success) redirect(`/companies/new?error=invalid${demo ? "&demo=1" : ""}`);
-  const company = await asActor(user.id, (db) => createCompanyWithOwner(db, parsed.data));
-  redirect(demo ? `/companies/${company.id}/profile?demo=1` : `/companies/${company.id}/overview`);
-}
+import { createCompanyAction } from "./actions";
 
 export default async function NewCompanyPage({ searchParams }: { searchParams: Promise<{ error?: string; demo?: string }> }) {
   if (!(await currentUser())) redirect("/api/guest?next=/companies/new");
