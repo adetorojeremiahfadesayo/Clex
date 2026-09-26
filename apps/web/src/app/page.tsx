@@ -4,6 +4,8 @@ import { lifecycleStageLabels } from "@lex/domain";
 import { listCompanies } from "@lex/db";
 import { asActor } from "@/lib/db";
 import { currentUser } from "@/lib/session";
+import { StartDemoButton } from "@/components/start-demo-button";
+import { Clexa } from "@/components/clexa";
 
 export const dynamic = "force-dynamic";
 
@@ -12,30 +14,38 @@ export default async function HomePage() {
   if (!user) redirect("/api/guest?next=/");
   const companies = await asActor(user.id, (db) => listCompanies(db));
 
-  return (
-    <section className="space-y-8">
-      <div className="rounded-2xl bg-[#183b50] px-6 py-8 text-white sm:px-9 sm:py-10">
-        <span className="text-xs font-semibold uppercase tracking-[.16em] text-blue-200">A legal workspace that learns your business</span>
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-5"><div><h1 className="max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">Start well. Keep your company ready.</h1><p className="mt-3 max-w-xl text-sm leading-6 text-blue-100">Confirm your company profile, see starting tasks, then prepare contracts and questions with the context your lawyer needs.</p></div><Link href="/companies/new" className="rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-[#183b50]">Add a company →</Link></div>
+  return <section className="space-y-12">
+    <div id="demo" className="clex-hero">
+      <div className="clex-hero-copy">
+        <span className="clex-hero-kicker">Meet Clex · with Clexa by your side</span>
+        <h1 className="clex-hero-title">Your company, <em>clearly prepared.</em></h1>
+        <p className="clex-hero-sub">From the first registration question to the contract on your desk, Clex turns your company facts into a practical path and a clearer handoff to your lawyer.</p>
+        <div className="clex-hero-actions"><StartDemoButton /><Link href="/companies/new" className="clex-hero-secondary">Start with my company →</Link></div>
+        <div className="clex-hero-proof"><span>No account needed</span><span>Private browser workspace</span><span>Preparation, clearly labelled</span></div>
       </div>
-      <div><div className="mb-3 flex items-center justify-between"><h2 className="text-xl font-semibold">Your companies</h2><span className="text-sm text-slate-500">{companies.length} workspaces</span></div>
-      {companies.length === 0 ? (
-        <p className="card border-dashed p-6 text-slate-600">
-          You have no companies yet. Add one to build a confirmed profile and tailored starting checklist.
-        </p>
-      ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {companies.map((c) => (
-            <li key={c.id} className="card p-5">
-              <Link href={`/companies/${c.id}/overview`} className="text-lg font-semibold underline-offset-2 hover:underline">
-                {c.name}
-              </Link>
-              <p className="mt-1 text-sm text-slate-600">{lifecycleStageLabels[c.lifecycleStage]}</p><Link href={`/companies/${c.id}/matters`} className="mt-4 inline-block text-sm font-medium text-[var(--accent)] underline">Open contracts & matters →</Link>
-            </li>
-          ))}
-        </ul>
-      )}</div>
-      <p className="text-xs text-slate-500">Each browser gets a private workspace automatically. Keep this browser’s cookies to retain access; this preview does not offer account recovery.</p>
-    </section>
-  );
+      <div className="clex-scene" aria-hidden="true">
+        <div className="clex-scene-orbit" />
+        <div className="clex-scene-sheet clex-scene-sheet-back"><span className="clex-scene-tag">Company profile</span><div className="clex-scene-heading">The facts behind the advice</div><div className="clex-scene-rule" /><div className="clex-scene-rule mid" /><div className="clex-scene-rule short" /></div>
+        <div className="clex-scene-sheet clex-scene-sheet-front"><span className="clex-scene-tag">Supplier review · sample</span><div className="clex-scene-heading">Before you sign, see what changed.</div><div className="clex-scene-rule mid" /><div className="clex-scene-highlight">Your plan: pay in 30 days.<br />Sample agreement: pay in 7 days.</div><div className="clex-scene-rule short" /></div>
+        <Clexa className="clex-scene-character" decorative />
+        <div className="clex-scene-badge">Clexa found a question to raise with counsel ✦</div>
+      </div>
+    </div>
+
+    <div>
+      <div className="clex-section-head"><div><p className="eyebrow">One connected journey</p><h2 className="clex-section-title">Start well. Stay ready.</h2></div><p className="clex-section-caption">Clexa guides the steps, while your confirmed company facts shape what appears next. Nothing is treated as legally verified just because it was entered.</p></div>
+      <ol className="clex-journey">
+        <li className="clex-journey-step"><span className="clex-journey-index">01</span><h3>Tell Clex about the business</h3><p>Formation market, registration stage, work, people, and what is still unknown.</p></li>
+        <li className="clex-journey-step"><span className="clex-journey-index">02</span><h3>See the starting path</h3><p>Get a checklist with reasons linked to those answers and official directory pointers where available.</p></li>
+        <li className="clex-journey-step"><span className="clex-journey-index">03</span><h3>Prepare the next decision</h3><p>Bring a hiring or supplier matter, review document excerpts, and leave with a packet for counsel.</p></li>
+      </ol>
+    </div>
+
+    <div>
+      <div className="clex-section-head"><div><p className="eyebrow">Your workspace</p><h2 className="clex-section-title">Your companies</h2></div><p className="clex-section-caption">{companies.length} {companies.length === 1 ? "company" : "companies"} in this browser</p></div>
+      {companies.length === 0 ? <div className="clex-empty">You have no companies yet. Try the synthetic demo above or <Link href="/companies/new" className="font-semibold underline">add your company</Link>.</div> :
+        <ul className="clex-company-list">{companies.map((c) => <li key={c.id}><Link href={`/companies/${c.id}/overview`} className="clex-company-card"><h3>{c.name}</h3><p className="mt-2">{lifecycleStageLabels[c.lifecycleStage]}</p><span className="clex-company-arrow">Open company workspace →</span></Link></li>)}</ul>}
+    </div>
+    <p className="clex-privacy">Each browser receives a private workspace automatically. Keep this browser’s cookies to retain access; account recovery is not part of this hackathon preview. The demo uses synthetic facts and local preparation, not lawyer-approved legal guidance.</p>
+  </section>;
 }

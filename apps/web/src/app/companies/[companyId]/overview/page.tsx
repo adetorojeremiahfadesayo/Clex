@@ -2,11 +2,12 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { type FactKey, intakeProgress, intakeQuestions, lifecycleStageLabels, uuidSchema } from "@lex/domain";
 import { findRule } from "@lex/content";
-import { getCompany, listMemberships } from "@lex/db";
+import { getCompany } from "@lex/db";
 import { buildChecklistView } from "@/lib/checklist-view";
 import { loadCompanyStart } from "@/lib/company-start";
 import { asActor } from "@/lib/db";
 import { currentUser } from "@/lib/session";
+import { ClexaGuide } from "@/components/clexa-guide";
 
 export const dynamic = "force-dynamic";
 
@@ -20,26 +21,30 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
   const data = await asActor(user.id, async (db) => {
     const company = await getCompany(db, companyId);
     if (!company) return null;
-    return { company, memberships: await listMemberships(db, companyId), start: await loadCompanyStart(db, companyId) };
+    return { company, start: await loadCompanyStart(db, companyId) };
   });
   if (!data) notFound();
-  const { company, memberships, start } = data;
-  const myRole = memberships.find((m) => m.userId === user.id && !m.revokedAt)?.role ?? "member";
+  const { company, start } = data;
   const facts = start.revision?.facts ?? {};
   const progress = intakeProgress(facts);
   const view = buildChecklistView(start, start.pack);
   const result = start.assessment?.result;
   const nextSteps = view.entries.filter((e) => !["user_completed", "reviewer_verified", "dismissed_with_reason"].includes(e.item.status)).slice(0, 3);
+  const primaryStep = !start.revision
+    ? { label: "Complete company profile", href: `/companies/${company.id}/profile`, description: "Tell us where you operate and what the business does. Unknown answers are okay." }
+    : nextSteps.length
+      ? { label: "Review starting checklist", href: `/companies/${company.id}/checklist`, description: "See what to prepare now, with reasons tied to your confirmed answers." }
+      : { label: "Prepare a contract or decision", href: `/companies/${company.id}/matters`, description: "Bring a hiring, supplier or other legal matter into this company workspace." };
 
   return (
     <section className="space-y-6">
       <nav className="text-sm text-slate-600" aria-label="Breadcrumb">
         <Link href="/" className="underline">Companies</Link> / {company.name}
       </nav>
-      <div>
-        <h1 className="text-2xl font-semibold">{company.name}</h1>
-        <p className="text-slate-600">{lifecycleStageLabels[company.lifecycleStage]} · your role: {myRole}</p>
-      </div>
+      <div><p className="eyebrow">Company workspace</p><h1 className="clex-overview-title mt-2">{company.name}</h1><p className="clex-status-pill">{lifecycleStageLabels[company.lifecycleStage]}</p></div>
+
+      <ClexaGuide title={primaryStep.label} description={primaryStep.description} href={primaryStep.href} action="Continue" />
+      <ol className="flex flex-wrap gap-x-5 gap-y-2 border-b border-[var(--color-rule)] pb-4 text-xs font-bold text-[var(--color-ink-2)]" aria-label="Company journey"><li><Link href={`/companies/${company.id}/profile`} className="hover:underline">01 Company profile</Link></li><li><Link href={`/companies/${company.id}/checklist`} className="hover:underline">02 Starting checklist</Link></li><li><Link href={`/companies/${company.id}/matters`} className="hover:underline">03 Contracts & matters</Link></li></ol>
 
       <div className="grid gap-4 md:grid-cols-2">
         <article className="rounded border border-slate-200 bg-white p-4">
@@ -97,7 +102,6 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
           <Link href={`/companies/${company.id}/checklist`} className="underline">Open checklist</Link>
           <Link href={`/companies/${company.id}/matters`} className="underline">Contracts & matters</Link>
           <a href={`/api/v1/companies/${company.id}/exports/brief`} target="_blank" rel="noopener" className="underline">Preparation brief</a>
-          <Link href={`/companies/${company.id}/jobs`} className="underline">Background jobs</Link>
         </div>
       </article>
 
@@ -108,17 +112,6 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
         </article>
       )}
 
-      <article className="rounded border border-slate-200 bg-white p-4">
-        <h2 className="font-medium">Members</h2>
-        <ul className="mt-2 divide-y divide-slate-100 text-sm">
-          {memberships.map((m) => (
-            <li key={m.id} className="flex justify-between py-2">
-              <span>{m.userId === user.id ? `${user.displayName} (you)` : m.userId}</span>
-              <span className="text-slate-600">{m.role}{m.revokedAt ? " · revoked" : ""}</span>
-            </li>
-          ))}
-        </ul>
-      </article>
     </section>
   );
 }

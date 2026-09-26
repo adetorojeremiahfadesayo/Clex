@@ -1,5 +1,5 @@
 {
-  "name": "lex-company-counsel",
+  "name": "clex",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "build": "pnpm -r --if-present build",
     "db:setup": "tsx packages/db/src/cli/setup.ts",
+    "db:deploy:preview": "tsx packages/db/src/cli/deploy-preview.ts",
     "db:migrate": "tsx packages/db/src/cli/migrate.ts",
     "seed:demo": "tsx packages/db/src/cli/seed-demo.ts",
     "eval:legal": "tsx scripts/eval-legal.ts",

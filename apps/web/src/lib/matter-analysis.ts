@@ -40,6 +40,21 @@ export function prepareMatter(matter:Matter, facts:FactMap, document:MatterDocum
     if(payment) add("Check payment wording","Compare this wording with the payment terms you intended. Record mismatches for legal review.",`Matter payment context: ${matter.context.payment||"not supplied"}.`,"document",payment);
     const termination=excerptFor(text,/\b(terminat(?:e|ion)|notice period|end of term)\b/i);
     if(termination) add("Check exit wording","Confirm the exit process matches the commercial or hiring plan and ask counsel to review local requirements.",`Matter type: ${matter.kind}; company context: ${profileDescription(facts)}.`,"document",termination);
+    const law=excerptFor(text,/\b(governed by|governing law|jurisdiction|applicable law)\b/i);
+    if(law) add("Confirm governing law","Compare the document's governing-law wording with the actual places where the company and counterparty operate. Ask local counsel to check the consequences.",`Matter expectation: ${matter.context.governingLaw||"not confirmed"}; company context: ${profileDescription(facts)}.`,"document",law);
+    if(matter.kind==="supplier") {
+      const scope=excerptFor(text,/\b(scope of work|deliverables|services to be provided|acceptance criteria)\b/i);
+      if(scope) add("Match the promised work","Check that the written scope and acceptance process match what you asked the supplier to deliver.",`Intended deliverables: ${matter.context.deliverables||"not supplied"}.`,"document",scope);
+      const liability=excerptFor(text,/\b(limitation of liability|indemnif(?:y|ication)|liability cap)\b/i);
+      if(liability) add("Review risk allocation","Identify whose losses this wording covers, any cap or exception, and the business exposure you are willing to accept. Have counsel assess the clause.",`Supplier relationship: ${matter.title}; company context: ${profileDescription(facts)}.`,"document",liability);
+      const data=excerptFor(text,/\b(personal data|customer data|data protection|security measures|confidential information)\b/i);
+      if(data) add("Clarify data handling","Compare the document's data obligations with the access the supplier will actually have and prepare a question for a data-protection adviser.",`Supplier access: ${matter.context.dataAccess||"not confirmed"}; company customer data: ${answeredString(facts,"customer_data")||"not confirmed"}.`,"document",data);
+      if(!scope) questions.push("No scope or acceptance wording was found in extracted text. Could it be in a statement of work or attachment?");
+    }
+    if(matter.kind==="employment") {
+      const ip=excerptFor(text,/\b(intellectual property|work product|invention|copyright assignment)\b/i);
+      if(ip) add("Review work-product ownership","Compare the wording with what this person will create and the company's intended ownership. A lawyer should check the local treatment.",`Role: ${matter.context.role||"not supplied"}; company activity: ${answeredString(facts,"activities")||"not confirmed"}.`,"document",ip);
+    }
     if(!payment) questions.push("No payment wording was found in the extracted text. Is it in an attachment or another document?");
     if(!termination) questions.push("No exit or termination wording was found in the extracted text. Is it in an attachment or another document?");
   } else if(document) questions.push("This file yielded too little readable text. Upload a text PDF, DOCX or TXT version; scanned PDFs need OCR.");

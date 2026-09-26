@@ -96,7 +96,8 @@ export function IntakeForm({
 }
 
 function Question({ q }: { q: IntakeQuestionView }) {
-  const [mode, setMode] = useState<"answer" | "unknown" | "skipped" | "">(q.state === "answered" ? "answer" : q.state === "unknown" ? "unknown" : q.state === "skipped" ? "skipped" : "");
+  // Existing answers remain visible, but only explicit edits belong in this revision.
+  const [mode, setMode] = useState<"answer" | "unknown" | "skipped" | "">("");
   const inputId = `q-${q.key}`;
   const stateLabel = q.state === "answered" ? "Confirmed" : q.state === "unknown" ? "Not sure" : q.state === "skipped" ? "Skipped" : "Not answered";
   return (

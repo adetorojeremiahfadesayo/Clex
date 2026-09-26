@@ -61,7 +61,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ compan
       <p className="rounded border border-slate-200 bg-white p-3 text-sm text-slate-700">
         Questions adapt to your earlier answers. <strong>Not sure</strong> keeps a fact unknown instead of guessing; <strong>Skip</strong> leaves it for later. Every save is a new versioned revision you can review below.
       </p>
-      <IntakeForm companyId={companyId} currentVersion={current?.version ?? 0} groups={groups} />
+      <IntakeForm key={current?.version ?? 0} companyId={companyId} currentVersion={current?.version ?? 0} groups={groups} />
       <details className="rounded border border-slate-200 bg-white p-4">
         <summary className="cursor-pointer font-medium">Revision history ({data.history.length})</summary>
         <ul className="mt-3 divide-y divide-slate-100 text-sm">
