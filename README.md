@@ -8,7 +8,7 @@ The product learns the company's confirmed context, assesses its starting positi
 
 **Judge quick start (two phases, about 90 seconds):** Open the preview and click **Click demo answers**.
 
-*Phase 1: Registration.* (1) **Pick all demo answers → Save**. (2) **Fill all demo details** saves proposed names, founders and shares, and the registered address; each step turns green by itself (no manual ticking). (3) **Get my registration pack → Download registration pack (PDF)**, then the success screen. (4) **Use sample certificate → Complete registration**.
+*Phase 1: Registration.* (1) On each of the five question pages, select **Fill this page with demo answers**, read the answers, then press **Next**. Review them and select **Save company answers**. (2) **Fill all demo details** saves proposed names, founders and shares, and the registered address; each step turns green by itself (no manual ticking). (3) **Get my registration pack → Download registration pack (PDF)**, then the success screen. (4) **Use sample certificate → Complete registration**.
 
 *Phase 2: Compliance.* The dashboard shows compliance health, 7 areas with statuses (Not started / In progress / Needs attention / In order), and a placeholder compliance calendar. Open **Contracts & suppliers**, add the sample Slack thread and document, then tap **Does this contract match…?** (status becomes *Needs attention*: payment 30 vs 7 days, governing law) and **Draft a letter asking for changes** (status becomes *In order*). All samples are synthetic; without `LLM_*` the agent uses labelled local rules. Calendar dates are planning placeholders, not legal deadlines.
 
