@@ -1,6 +1,6 @@
 # Hoplite handoff
 
-Updated 25 September 2026. The repository contains a working local company counsel workspace. Start from `main` after merged PR #4; PR #5 adds broader document preparation and regression checks. Read [STATUS.md](STATUS.md) for verified behavior and open work. Do not rebuild the app or add sign-in/sign-out screens.
+Historical platform handoff. The team now builds with Codex; use [CODEX_BUILD.md](CODEX_BUILD.md) for current priorities. The repository contains a working local company counsel workspace. Do not rebuild the app or add sign-in/sign-out screens.
 
 ## Current product
 

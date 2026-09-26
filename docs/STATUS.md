@@ -2,6 +2,8 @@
 
 Updated: 2026-09-25 (matter workspace build). Historical milestone notes below describe their state at the time; this section is current.
 
+Codex is now the development tool; Hoplite references in the historical milestone notes record earlier work. The current submission and UI review is in [CODEX_BUILD.md](CODEX_BUILD.md).
+
 ### Current implementation — 2026-09-25
 
 - **End-user account screens removed.** Opening the site creates an isolated guest identity and secure cookie session automatically. No sign-in or sign-out routes remain. Data remains tied to that browser session; clearing cookies or session expiry loses access because recovery is not implemented. This is acceptable for a private hackathon preview, not a production account model.

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { type FactKey, intakeProgress, intakeQuestions, lifecycleStageLabels, uuidSchema } from "@lex/domain";
 import { findRule } from "@lex/content";
-import { getCompany, listMemberships } from "@lex/db";
+import { getCompany } from "@lex/db";
 import { buildChecklistView } from "@/lib/checklist-view";
 import { loadCompanyStart } from "@/lib/company-start";
 import { asActor } from "@/lib/db";
@@ -20,16 +20,20 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
   const data = await asActor(user.id, async (db) => {
     const company = await getCompany(db, companyId);
     if (!company) return null;
-    return { company, memberships: await listMemberships(db, companyId), start: await loadCompanyStart(db, companyId) };
+    return { company, start: await loadCompanyStart(db, companyId) };
   });
   if (!data) notFound();
-  const { company, memberships, start } = data;
-  const myRole = memberships.find((m) => m.userId === user.id && !m.revokedAt)?.role ?? "member";
+  const { company, start } = data;
   const facts = start.revision?.facts ?? {};
   const progress = intakeProgress(facts);
   const view = buildChecklistView(start, start.pack);
   const result = start.assessment?.result;
   const nextSteps = view.entries.filter((e) => !["user_completed", "reviewer_verified", "dismissed_with_reason"].includes(e.item.status)).slice(0, 3);
+  const primaryStep = !start.revision
+    ? { label: "Complete company profile", href: `/companies/${company.id}/profile`, description: "Tell us where you operate and what the business does. Unknown answers are okay." }
+    : nextSteps.length
+      ? { label: "Review starting checklist", href: `/companies/${company.id}/checklist`, description: "See what to prepare now, with reasons tied to your confirmed answers." }
+      : { label: "Prepare a contract or decision", href: `/companies/${company.id}/matters`, description: "Bring a hiring, supplier or other legal matter into this company workspace." };
 
   return (
     <section className="space-y-6">
@@ -38,7 +42,18 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
       </nav>
       <div>
         <h1 className="text-2xl font-semibold">{company.name}</h1>
-        <p className="text-slate-600">{lifecycleStageLabels[company.lifecycleStage]} · your role: {myRole}</p>
+        <p className="text-slate-600">{lifecycleStageLabels[company.lifecycleStage]}</p>
+      </div>
+
+      <div className="rounded-2xl border border-[#b9d0d9] bg-[#eaf2f3] p-5 shadow-sm sm:p-6">
+        <p className="eyebrow">Your next move</p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+          <div><h2 className="text-xl font-semibold">{primaryStep.label}</h2><p className="mt-1 max-w-xl text-sm text-slate-700">{primaryStep.description}</p></div>
+          <Link href={primaryStep.href} className="button-primary">Continue →</Link>
+        </div>
+        <ol className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-[#cadce1] pt-4 text-xs font-medium text-slate-700" aria-label="Company journey">
+          <li>1. Company profile</li><li>2. Starting checklist</li><li>3. Contracts & matters</li>
+        </ol>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -97,7 +112,6 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
           <Link href={`/companies/${company.id}/checklist`} className="underline">Open checklist</Link>
           <Link href={`/companies/${company.id}/matters`} className="underline">Contracts & matters</Link>
           <a href={`/api/v1/companies/${company.id}/exports/brief`} target="_blank" rel="noopener" className="underline">Preparation brief</a>
-          <Link href={`/companies/${company.id}/jobs`} className="underline">Background jobs</Link>
         </div>
       </article>
 
@@ -108,17 +122,6 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
         </article>
       )}
 
-      <article className="rounded border border-slate-200 bg-white p-4">
-        <h2 className="font-medium">Members</h2>
-        <ul className="mt-2 divide-y divide-slate-100 text-sm">
-          {memberships.map((m) => (
-            <li key={m.id} className="flex justify-between py-2">
-              <span>{m.userId === user.id ? `${user.displayName} (you)` : m.userId}</span>
-              <span className="text-slate-600">{m.role}{m.revokedAt ? " · revoked" : ""}</span>
-            </li>
-          ))}
-        </ul>
-      </article>
     </section>
   );
 }

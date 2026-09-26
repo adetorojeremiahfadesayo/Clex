@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -H ${HOST:-0.0.0.0} -p ${PORT:-3000}",
+    "dev": "node scripts/next-server.mjs dev",
     "build": "next build",
-    "start": "next start -H ${HOST:-0.0.0.0} -p ${PORT:-3000}",
+    "start": "node scripts/next-server.mjs start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },

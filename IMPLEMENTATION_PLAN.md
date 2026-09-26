@@ -106,7 +106,7 @@ Browser -> authenticated Next.js API -> Postgres (RLS)
 
 Do not split every model step into a microservice. An orchestrated pipeline with typed stages is sufficient. Provider adapter allows model choice without changing domain logic. No model keys in the browser. Start with full-text/metadata retrieval; add vectors only after retrieval evaluation shows benefit. Select an embedding model and dimensionality together if vectors are added.
 
-Hoplite is the development/preview environment. Production defaults can be Next.js on a container-capable host, a persistent worker, managed Postgres/auth/storage and server-side model credentials. Do not assume the sandbox filesystem is durable or its preview is production hosting. See docs/HOPLITE_HANDOFF.md.
+Codex is the current development tool. Production defaults can be Next.js on a container-capable host, a persistent worker, managed Postgres/auth/storage and server-side model credentials. A local Codex preview is not production hosting. See docs/CODEX_BUILD.md for the current submission path; docs/HOPLITE_HANDOFF.md records the earlier platform handoff.
 
 Proposed layout (create during implementation):
 

@@ -9,11 +9,11 @@ The product learns the company's confirmed context, assesses its starting positi
 ## Local development
 
 ```bash
-pnpm install
-source scripts/dev-env.sh   # Linux/Hoplite: starts Postgres, applies migrations, exports DB URLs
+pnpm install --frozen-lockfile
 pnpm dev                    # web on http://localhost:3000
-PG_ADMIN_URL=postgres://postgres@localhost:5432/postgres pnpm test
 ```
+
+Codex on Windows: start PostgreSQL, run `pnpm db:setup` for a new database, copy `.env.example` to `apps/web/.env.local`, and set the database URLs there before `pnpm dev`. For the full test suite in PowerShell, set `$env:PG_ADMIN_URL='postgres://postgres@localhost:5432/postgres'` and run `pnpm test`. The web start scripts work on Windows and Linux; `HOST` and `PORT` can be set in the environment. On Linux, `source scripts/dev-env.sh` can prepare a local development database.
 
 For other environments, create the database and `lex_app` role with `pnpm db:setup`, then set `DATABASE_URL` and `APP_DATABASE_URL` in `apps/web/.env.local` (copy `.env.example`). The web server needs the RLS-bound `APP_DATABASE_URL`; the privileged URL is used for migrations. In production, use managed PostgreSQL and persistent backups. Documents are stored privately in PostgreSQL rather than an ephemeral app filesystem.
 
@@ -22,11 +22,12 @@ Set `LLM_PROVIDER=openai` or `anthropic`, `LLM_MODEL` and `LLM_API_KEY` server-s
 ## Start here
 
 1. [Implementation plan](IMPLEMENTATION_PLAN.md) — agreed scope, UX, architecture, schema, API, AI contracts and delivery order.
-2. [Hoplite handoff](docs/HOPLITE_HANDOFF.md) — repository connection, configuration and paste-ready build prompt.
-3. [Jurisdiction and content policy](docs/JURISDICTION_PACKS.md) — target markets, source review and honest coverage.
-4. [Acceptance tests](docs/ACCEPTANCE_TESTS.md) — measurable completion requirements.
-5. [Delivery backlog](docs/BACKLOG.md) — tasks, dependencies and evidence.
-6. [Status](docs/STATUS.md) — update after every completed milestone.
+2. [Codex build and submission guide](docs/CODEX_BUILD.md) — current build priorities, review evidence and submission handoff.
+3. [Render preview](docs/RENDER_PREVIEW.md) — private-repo deployment settings and live verification.
+4. [Jurisdiction and content policy](docs/JURISDICTION_PACKS.md) — target markets, source review and honest coverage.
+5. [Acceptance tests](docs/ACCEPTANCE_TESTS.md) — measurable completion requirements.
+6. [Delivery backlog](docs/BACKLOG.md) — tasks, dependencies and evidence.
+7. [Status](docs/STATUS.md) — update after every completed milestone.
 
 ## Product path
 
@@ -34,7 +35,7 @@ Company profile → current-position assessment → personalised starting checkl
 
 Target markets: Nigeria, the UK, the US, European countries and China. The application must distinguish selecting a market from having reviewed guidance for that market and matter type.
 
-Development platform: Hoplite. Current stack: TypeScript, Next.js and PostgreSQL with row-level security. The separate job worker remains in the repository for existing jobs; matter analysis currently runs in a server request. Production hosting and LLM provider remain configurable.
+Development tool: Codex. Current stack: TypeScript, Next.js and PostgreSQL with row-level security. The separate job worker remains in the repository for existing jobs; matter analysis currently runs in a server request. Production hosting and LLM provider remain unconfigured.
 
 ## Boundaries
 
