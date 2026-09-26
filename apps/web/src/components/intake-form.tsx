@@ -32,6 +32,7 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
   const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(intakeQuestions.map((q) => [q.key, answeredString(facts, q.key) ?? ""])));
   // Existing answers remain visible, but only explicit edits belong in this revision.
   const [modes, setModes] = useState<Record<string, Mode>>({});
@@ -40,6 +41,16 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
   const groups = (Object.keys(intakeGroupLabels) as IntakeGroup[])
     .map((group) => ({ group, label: intakeGroupLabels[group], views: views.filter((v) => v.question.group === group) }))
     .filter((g) => g.views.length > 0);
+  const reviewIndex = groups.length;
+  const onReview = stepIndex >= reviewIndex;
+  const currentGroup = groups[Math.min(stepIndex, groups.length - 1)];
+  const pct = Math.round((Math.min(stepIndex, reviewIndex) / reviewIndex) * 100);
+  const pickedSummary = views.filter((v) => modes[v.question.key]).map((v) => {
+    const mode = modes[v.question.key];
+    const raw = values[v.question.key] ?? "";
+    const shown = mode === "unknown" ? "Not sure" : mode === "skipped" ? "Skipped" : v.question.options?.find((o) => o.value === raw)?.label ?? raw;
+    return { key: v.question.key, prompt: v.prompt, shown, step: groups.findIndex((g) => g.group === v.question.group) };
+  });
 
   function setValue(key: string, value: string) {
     setValues((v) => ({ ...v, [key]: value }));
@@ -57,6 +68,7 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
   function fillAllDemo() {
     // Includes follow-ups that only apply once earlier demo answers are picked.
     for (const q of intakeQuestions) if (factState(facts, q.key) === "missing") pickDemo(q.key);
+    setStepIndex(Number.MAX_SAFE_INTEGER);
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -94,20 +106,24 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
-      {demoMode && (
+    <form onSubmit={onSubmit} className="clex-wizard">
+      {demoMode && !onReview && (
         <div className="clex-demo-banner" role="region" aria-label="Demo answers">
           <div>
             <strong>Demo answers are on</strong>
-            <p>Every question has a gold tag with a sample answer for a Lagos bakery. Tap it to pick, or choose your own answer. Nothing is saved until you confirm.</p>
+            <p>Each question has an orange tag with a sample answer for a Lagos bakery. Tap it, or pick every answer at once.</p>
           </div>
-          <button type="button" className="button-primary" onClick={fillAllDemo}>Pick all demo answers</button>
+          <button type="button" className="button-primary" onClick={fillAllDemo}>Pick all demo answers →</button>
         </div>
       )}
-      {groups.map((g) => (
-        <fieldset key={g.group} className="clex-intake-group">
-          <legend>{g.label}</legend>
-          {g.views.map((v) => (
+      <div className="clex-wizard-top">
+        <span>{onReview ? "Review and save" : `Step ${stepIndex + 1} of ${groups.length} · ${currentGroup?.label}`}</span>
+        <div className="clex-progress" role="progressbar" aria-label="Question progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}><span style={{ width: `${pct}%` }} /></div>
+      </div>
+      {!onReview && currentGroup ? (
+        <fieldset key={currentGroup.group} className="clex-intake-group">
+          <legend className="sr-only">{currentGroup.label}</legend>
+          {currentGroup.views.map((v) => (
             <Question
               key={v.question.key}
               view={v}
@@ -121,13 +137,22 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
             />
           ))}
         </fieldset>
-      ))}
+      ) : (
+        <div className="clex-review-list">
+          {pickedSummary.length === 0 ? <p className="clex-note">You haven&apos;t picked any answers yet. Go back and answer a few questions.</p> : (
+            <ul>{pickedSummary.map((p) => <li key={p.key}><span>{p.prompt}</span><button type="button" onClick={() => setStepIndex(p.step)} aria-label={`Change answer: ${p.prompt}`}>{p.shown}</button></li>)}</ul>
+          )}
+        </div>
+      )}
       {error && <p role="alert" className="clex-alert">{error}</p>}
-      <div className="clex-savebar">
-        <button type="submit" disabled={pending} className="button-primary">{pending ? "Saving…" : "Save and build my checklist"}</button>
-        <span>{touched ? `${touched} answer${touched === 1 ? "" : "s"} ready.` : "Pick answers above."} Saving creates profile revision {currentVersion + 1}.</span>
-        {!demoMode && <Link href="?demo=1&edit=1#profile" scroll={false} className="clex-link">Show demo answers</Link>}
+      <div className="clex-wizard-nav">
+        <button type="button" className="button-ghost" disabled={stepIndex === 0} onClick={() => setStepIndex(Math.max(0, Math.min(stepIndex, reviewIndex) - 1))}>← Back</button>
+        <span className="clex-wizard-count">{touched ? `${touched} answered` : "Nothing picked yet"}</span>
+        {onReview
+          ? <button type="submit" disabled={pending || touched === 0} className="button-primary">{pending ? "Saving…" : "Save and build my checklist →"}</button>
+          : <button type="button" className="button-primary" onClick={() => setStepIndex(stepIndex + 1)}>{stepIndex === reviewIndex - 1 ? "Review answers →" : "Next →"}</button>}
       </div>
+      {!demoMode && <p className="clex-wizard-foot">Saving creates profile revision {currentVersion + 1}. <Link href="?demo=1&edit=1#profile" scroll={false} className="clex-link">Show demo answers</Link></p>}
     </form>
   );
 }

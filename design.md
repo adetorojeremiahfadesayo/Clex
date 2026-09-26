@@ -13,7 +13,7 @@ Editorial and approachable. The landing page has cinematic depth; the app remain
 - Content: restrained reading layout, source status always visible.
 
 ## Theme and tokens
-The implemented source of truth is `apps/web/src/app/tokens.css`. Warm paper, evergreen ink, mint action, restrained terracotta annotation. All new Clex design CSS reads named tokens.
+The implemented source of truth is `apps/web/src/app/tokens.css`. White Notion-style canvas, near-black ink, emerald action colour, deep emerald gradient heroes (Comp AI reference), dark Raycast-style panels for the checklist and agent chat, and orange/gold/violet accents for highlights and modules. Clexa stays. All new Clex design CSS reads named tokens.
 
 ## Typography
 - Display: Georgia, serif; expressive but legible.

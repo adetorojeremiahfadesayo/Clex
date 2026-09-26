@@ -16,6 +16,7 @@
     "@lex/domain": "workspace:*",
     "mammoth": "1.11.0",
     "next": "16.3.5",
+    "pdf-lib": "1.17.1",
     "pdf-parse": "2.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
