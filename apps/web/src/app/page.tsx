@@ -13,9 +13,9 @@ export const dynamic = "force-dynamic";
 
 const journey = [
   { n: "01", title: "Answer a few questions", body: "One short screen at a time. “Not sure” is a real answer.", tone: "is-mint" },
-  { n: "02", title: "Tick off your checklist", body: "Steps built from your answers. Tap the circle when one's done.", tone: "is-gold" },
-  { n: "03", title: "Download your pack", body: "A PDF with your facts, steps and questions, ready for your lawyer.", tone: "is-coral" },
-  { n: "04", title: "Run your company", body: "Contracts, hiring, data, filings: an agent reads your docs and chats and drafts the next letter.", tone: "is-violet" },
+  { n: "02", title: "Prepare registration details", body: "Save names, founders, address and legal form. Progress updates from those actions.", tone: "is-gold" },
+  { n: "03", title: "Pack and certificate", body: "Download a PDF for your lawyer, then upload proof when you are registered.", tone: "is-coral" },
+  { n: "04", title: "Manage ongoing work", body: "Track contracts, hiring, data and filings with a workspace for each area.", tone: "is-violet" },
 ];
 
 export default async function HomePage() {
@@ -27,7 +27,7 @@ export default async function HomePage() {
     <div className="clex-hero">
       <p className="clex-hero-kicker"><span>New</span> From registration to running the company</p>
       <h1 className="clex-hero-title">Your company,<br /><mark>clearly prepared.</mark></h1>
-      <p className="clex-hero-sub">Clex turns what you know about your business into a registration checklist, a pack for your lawyer, and an agent that keeps your contracts, hiring and filings in order.</p>
+      <p className="clex-hero-sub">Clex turns what you know about your business into registration steps, a pack for your lawyer, and workspaces for contracts, hiring and filings.</p>
       <div className="clex-hero-actions">
         <Link href="/companies/new" className="button-primary is-lg">Try it out →</Link>
         <form action={createCompanyAction}>
@@ -51,8 +51,8 @@ export default async function HomePage() {
             <div className="clex-window-draft"><span>Draft v1</span>Dear Demo Flour Co, before we sign, please update clause 2…</div>
           </div>
           <div className="clex-window-side">
-            <p className="clex-window-label">Checklist · 4/6</p>
-            {["Choose a company name", "Prepare founder IDs", "Register with the registrar", "Open a business bank account"].map((t, i) => <div key={t} className={`clex-window-item ${i < 2 ? "is-done" : ""}`}><span />{t}</div>)}
+            <p className="clex-window-label">Registration · 4/7</p>
+            {["Answer company questions", "Choose company names", "Download registration pack", "Upload certificate"].map((t, i) => <div key={t} className={`clex-window-item ${i < 2 ? "is-done" : ""}`}><span />{t}</div>)}
           </div>
         </div>
       </div>

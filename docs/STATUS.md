@@ -250,3 +250,10 @@ User feedback: the checklist only supported manual ticking and mixed registratio
 | PDF | 2 pages; registration details section rendered and inspected |
 
 Tested locally only at the time of this entry. Deployment status will be recorded after integration.
+
+### Two-phase integration and Render verification — 2026-09-27
+
+- Ported Hoplite commit `9d65441` onto current Lex main through PR #9, merged as `96bc6a8`, and advanced Render's `feat/complete-product` branch to the same commit. GitHub CI and Render deployment passed.
+- Local `pnpm build` and `pnpm lint` passed; `pnpm test` passed 34 tests and skipped 30 database tests without `PG_ADMIN_URL`. CI ran the database-backed checks.
+- Fresh-browser live check: demo intake saved 20 answers → registration details reached 5/7 → registration pack PDF downloaded → sample certificate and registration number completed Phase 1 → Phase 2 showed seven compliance areas and a calendar explicitly labelled as placeholder dates. A 390×844 screenshot of the dashboard was inspected. This synthetic company was separate from existing trial data.
+- Corrected landing-page copy to describe action-based registration, and labelled the percentage on the dashboard as tracked task progress rather than a legal compliance score.

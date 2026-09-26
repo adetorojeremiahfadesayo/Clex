@@ -45,7 +45,7 @@ export default async function CompliancePage({ params, searchParams }: { params:
   const regNumber = answeredString(facts, "registration_number");
   const tip = !reg.registered
     ? "You haven't finished registration yet. You can look around, but start with Phase 1."
-    : attention.length ? `${attention[0]!.module.title} needs attention. Open it and draft a response.` : next ? `Next up: ${next.module.title}. ${demoMode && next.module.id === "contracts" ? "Add the sample Slack chat and contract, then ask me to check it." : ""}` : "Everything is in order. Nice.";
+    : attention.length ? `${attention[0]!.module.title} needs attention. Open it and draft a response.` : next ? `Next up: ${next.module.title}. ${demoMode && next.module.id === "contracts" ? "Add the sample Slack chat and contract, then ask me to check it." : ""}` : "All tracked tasks are complete. Review them with your adviser.";
 
   return (
     <section className="clex-page">
@@ -53,7 +53,7 @@ export default async function CompliancePage({ params, searchParams }: { params:
       <header className="clex-ws-hero">
         <div className="clex-ws-hero-copy">
           <p className="clex-chip-dark">Phase 2 · Compliance{reg.registered ? ` · Registered${regNumber ? ` ${regNumber}` : ""}` : ""}</p>
-          <h1 className="clex-ws-title">Keep {company.name} compliant</h1>
+          <h1 className="clex-ws-title">Keep {company.name} on track</h1>
           <JourneySteps companyId={companyId} step={4} q={q} />
         </div>
         <div className="clex-ws-guide">
@@ -67,7 +67,7 @@ export default async function CompliancePage({ params, searchParams }: { params:
       <div className="clex-health">
         <div className="clex-health-score">
           <div className="clex-ring is-lg" style={{ ["--pct" as string]: `${Math.round(score * 3.6)}deg` }}><span>{score}%</span></div>
-          <div><p className="eyebrow">Compliance health</p><p className="clex-muted">Share of compliance tasks completed across all areas.</p></div>
+          <div><p className="eyebrow">Task progress</p><p className="clex-muted">Share of tracked tasks completed across all areas; this is not a legal compliance score.</p></div>
         </div>
         <ul className="clex-health-stats">
           <li className="is-in_order"><strong>{counts("in_order")}</strong>In order</li>
