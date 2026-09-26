@@ -5,7 +5,10 @@ export interface ModuleSample {
   document?: { filename: string; text: string };
 }
 
+export type TaskKind = "document" | "conversation" | "review" | "draft";
+
 export interface CompanyModule {
+  tasks: { kind: TaskKind; label: string }[];
   id: string;
   title: string;
   kind: MatterKind;
@@ -21,6 +24,7 @@ const note = "SYNTHETIC SAMPLE — NOT A REAL CONVERSATION OR AGREEMENT";
 export const companyModules: CompanyModule[] = [
   {
     id: "contracts",
+    tasks: [{ kind: "document", label: "Upload your supplier and customer agreements" }, { kind: "conversation", label: "Import the deal conversation from Slack or Gmail" }, { kind: "review", label: "Run the agent check" }, { kind: "draft", label: "Draft your response" }],
     title: "Contracts & suppliers",
     kind: "supplier",
     blurb: "Check supplier and customer agreements against what you actually agreed.",
@@ -54,6 +58,7 @@ Flour supply agreement between Demo Flour Co and Clex Demo Bakery.
   },
   {
     id: "hiring",
+    tasks: [{ kind: "document", label: "Upload offer letters or contractor agreements" }, { kind: "conversation", label: "Import the hiring email thread" }, { kind: "review", label: "Check what was promised" }, { kind: "draft", label: "Draft the updated offer" }],
     title: "Hiring & employment",
     kind: "employment",
     blurb: "Offer letters, contractor agreements and what was promised in interviews.",
@@ -89,6 +94,7 @@ Termination: Either party may terminate on 2 weeks' notice.`,
   },
   {
     id: "privacy",
+    tasks: [{ kind: "document", label: "Upload your privacy notice or data-sharing agreement" }, { kind: "conversation", label: "Import team chats about customer data" }, { kind: "review", label: "Review how customer data is shared" }, { kind: "draft", label: "Draft a data-handling note for the team" }],
     title: "Data & privacy",
     kind: "other",
     blurb: "Customer data, mailing lists, and what your team shares with suppliers.",
@@ -109,6 +115,7 @@ Bola: Not yet, they said we can sign later.`,
   },
   {
     id: "tax",
+    tasks: [{ kind: "document", label: "Upload invoices, returns or accountant letters" }, { kind: "conversation", label: "Import your accountant's emails" }, { kind: "review", label: "List what your accountant needs" }, { kind: "draft", label: "Draft a reply to your accountant" }],
     title: "Tax & filings",
     kind: "other",
     blurb: "Keep track of returns, invoices and what your accountant asked for.",
@@ -131,6 +138,7 @@ Thanks, I'm not sure about VAT. I'll check.`,
   },
   {
     id: "licences",
+    tasks: [{ kind: "document", label: "Upload permits or licence letters" }, { kind: "conversation", label: "Import conversations about permits" }, { kind: "review", label: "Identify permits to confirm" }, { kind: "draft", label: "Draft an enquiry to the regulator" }],
     title: "Licences & permits",
     kind: "other",
     blurb: "Premises, food, trade and sector permits you may need to hold or renew.",
@@ -150,6 +158,7 @@ Ada: Can someone check before we open on the 3rd?`,
   },
   {
     id: "governance",
+    tasks: [{ kind: "document", label: "Upload minutes or shareholder agreements" }, { kind: "conversation", label: "Import founder decisions from chat" }, { kind: "review", label: "Find decisions to record" }, { kind: "draft", label: "Draft board minutes" }],
     title: "Board & shareholders",
     kind: "other",
     blurb: "Founder decisions, share promises, and records you should keep.",
@@ -169,6 +178,7 @@ Ada: Agreed. Also we decided to open the second kitchen, can we record that?`,
   },
   {
     id: "ip",
+    tasks: [{ kind: "document", label: "Upload design, logo or IP agreements" }, { kind: "conversation", label: "Import emails with designers or creators" }, { kind: "review", label: "Check who owns the work" }, { kind: "draft", label: "Draft an ownership confirmation" }],
     title: "Brand & IP",
     kind: "other",
     blurb: "Your name, logo, recipes and content, and who actually owns them.",
