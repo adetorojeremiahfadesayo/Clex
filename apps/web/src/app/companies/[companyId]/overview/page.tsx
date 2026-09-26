@@ -7,6 +7,7 @@ import { buildChecklistView } from "@/lib/checklist-view";
 import { loadCompanyStart } from "@/lib/company-start";
 import { asActor } from "@/lib/db";
 import { currentUser } from "@/lib/session";
+import { ClexaGuide } from "@/components/clexa-guide";
 
 export const dynamic = "force-dynamic";
 
@@ -40,21 +41,10 @@ export default async function OverviewPage({ params }: { params: Promise<{ compa
       <nav className="text-sm text-slate-600" aria-label="Breadcrumb">
         <Link href="/" className="underline">Companies</Link> / {company.name}
       </nav>
-      <div>
-        <h1 className="text-2xl font-semibold">{company.name}</h1>
-        <p className="text-slate-600">{lifecycleStageLabels[company.lifecycleStage]}</p>
-      </div>
+      <div><p className="eyebrow">Company workspace</p><h1 className="clex-overview-title mt-2">{company.name}</h1><p className="clex-status-pill">{lifecycleStageLabels[company.lifecycleStage]}</p></div>
 
-      <div className="rounded-2xl border border-[#b9d0d9] bg-[#eaf2f3] p-5 shadow-sm sm:p-6">
-        <p className="eyebrow">Your next move</p>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-          <div><h2 className="text-xl font-semibold">{primaryStep.label}</h2><p className="mt-1 max-w-xl text-sm text-slate-700">{primaryStep.description}</p></div>
-          <Link href={primaryStep.href} className="button-primary">Continue →</Link>
-        </div>
-        <ol className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-[#cadce1] pt-4 text-xs font-medium text-slate-700" aria-label="Company journey">
-          <li>1. Company profile</li><li>2. Starting checklist</li><li>3. Contracts & matters</li>
-        </ol>
-      </div>
+      <ClexaGuide title={primaryStep.label} description={primaryStep.description} href={primaryStep.href} action="Continue" />
+      <ol className="flex flex-wrap gap-x-5 gap-y-2 border-b border-[var(--color-rule)] pb-4 text-xs font-bold text-[var(--color-ink-2)]" aria-label="Company journey"><li><Link href={`/companies/${company.id}/profile`} className="hover:underline">01 Company profile</Link></li><li><Link href={`/companies/${company.id}/checklist`} className="hover:underline">02 Starting checklist</Link></li><li><Link href={`/companies/${company.id}/matters`} className="hover:underline">03 Contracts & matters</Link></li></ol>
 
       <div className="grid gap-4 md:grid-cols-2">
         <article className="rounded border border-slate-200 bg-white p-4">

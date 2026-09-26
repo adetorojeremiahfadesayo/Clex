@@ -1,10 +1,12 @@
-# Lex Company Counsel
+# Clex
 
-Working name for a company-specific legal and compliance workspace for startups and solo businesses.
+Clex is a company-specific legal preparation workspace for startups and solo businesses. Clexa is its friendly guide through formation, compliance preparation, and contract handoff.
 
 The product learns the company's confirmed context, assesses its starting position, explains next steps, and supports employment, supplier/commercial, and other business matters as the company grows. Lawyer review is part of this continuing workflow, not the entire product.
 
-**Status (25 September 2026):** Company onboarding, profile, checklist, three matter paths, private TXT/DOCX/text-PDF uploads, contextual preparation analysis, editable draft outlines, action items and printable lawyer packets work locally. Sign-in and sign-out screens have been removed; each browser receives an isolated guest workspace. A live OpenAI or Anthropic model adapter is implemented but has **not** been exercised with a real key. Legal packs remain unreviewed, and this is not a production legal service. See [docs/STATUS.md](docs/STATUS.md).
+**Status (26 September 2026):** A [live Render preview](https://lex-company-counsel.onrender.com/) supports company onboarding, profile, checklist, three matter paths, private TXT/DOCX/text-PDF uploads, contextual preparation analysis, editable draft outlines, action items and printable lawyer packets. Sign-in and sign-out screens have been removed; each browser receives an isolated guest workspace. A live OpenAI or Anthropic model adapter is implemented but has **not** been exercised with a real key. Legal packs remain unreviewed, and this is not a production legal service. See [docs/STATUS.md](docs/STATUS.md).
+
+**Judge quick start:** Open the [preview](https://lex-company-counsel.onrender.com/) and click **Explore the live demo**. It creates a persistent synthetic company in your browser's private workspace, with a Nigeria formation profile, starting checklist, sample flour supply agreement, excerpt-based preparation findings, and an editable working draft. Open **Contracts & matters → Flour supply agreement → Open lawyer packet** to see the handoff. Clicking the demo button again in the same browser reuses that sample; another visitor gets a separate copy. Keep browser cookies to retain access. The demo uses local preparation rules, not a live AI model or lawyer-approved legal guidance.
 
 ## Local development
 
@@ -35,7 +37,7 @@ Company profile → current-position assessment → personalised starting checkl
 
 Target markets: Nigeria, the UK, the US, European countries and China. The application must distinguish selecting a market from having reviewed guidance for that market and matter type.
 
-Development tool: Codex. Current stack: TypeScript, Next.js and PostgreSQL with row-level security. The separate job worker remains in the repository for existing jobs; matter analysis currently runs in a server request. Production hosting and LLM provider remain unconfigured.
+Development tool: Codex. Current stack: TypeScript, Next.js and PostgreSQL with row-level security. The separate job worker remains in the repository for existing jobs; matter analysis currently runs in a server request. Render hosts a disposable hackathon preview; production hosting and a live LLM provider remain unconfigured.
 
 ## Boundaries
 

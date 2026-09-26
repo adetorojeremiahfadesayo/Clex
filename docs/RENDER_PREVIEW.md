@@ -4,6 +4,8 @@ The preview uses a free Render web service and a free PostgreSQL 16 instance in 
 
 Live URL: https://lex-company-counsel.onrender.com/ . Deployment was verified on 26 September 2026 from commit `826219b`: `/api/health` returned HTTP 200, `/api/ready` reported `database: ok` and five migrations, and a browser completed synthetic company creation, profile, checklist, supplier matter, local preparation analysis and outline generation. The model mode is `no_model_configured`.
 
+For a judge, open the live URL and select **Try the ready-made demo**. Commit `4b6aa54` added the one-click sample. Live checks confirmed a fresh browser could open its own synthetic company, sample agreement, findings and draft; repeated requests reused that company's data, and another browser could not access it. The sample lives in PostgreSQL for the life of that guest session and preview database, not in a shared public cache. Keep the browser cookie to retain it.
+
 The repository includes `render.yaml`. In Render, create a Blueprint from the private repository's `feat/complete-product` branch. It references the already-created database by name and generates a separate app-role password. Its web service settings are:
 
 | Setting | Value |

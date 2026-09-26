@@ -1,12 +1,15 @@
 # Implementation status
 
-Updated: 2026-09-26 (live Render preview). Historical milestone notes below describe their state at the time; this section is current.
+Updated: 2026-09-26 (Clex rebrand and live Render preview). Historical milestone notes below describe their state at the time; this section is current.
 
 Codex is now the development tool; Hoplite references in the historical milestone notes record earlier work. The current submission and UI review is in [CODEX_BUILD.md](CODEX_BUILD.md).
 
 ### Current implementation — 2026-09-26
 
+- **Brand and UI:** Product name is Clex, with Clexa as an original illustrated guide. The landing page gives a single demo action, an animated document scene, and a clear founder journey; the company overview and matter page show contextual Clexa prompts. Motion has a reduced-motion fallback. The public Render hostname and private repository slug remain historical deployment identifiers until a safe rename is verified.
+
 - **Live preview:** [lex-company-counsel.onrender.com](https://lex-company-counsel.onrender.com/) is running on Render's free web service and free PostgreSQL in Virginia. Commit `826219b` deployed, `/api/health` and `/api/ready` returned HTTP 200, readiness reported five migrations and `no_model_configured`. Browser QA created a synthetic guest company, saved ten profile facts as revision 1, saw seven starter checklist items with explicit unknown applicability, created a supplier matter, generated a labelled local preparation finding and saved a draft outline. Document upload, exported packet, second-browser isolation and final mobile layout are still to be verified on this deployment. The free database expires 26 October 2026; this is a disposable demo.
+- **Judge demo (commit `4b6aa54`):** The homepage now creates an isolated synthetic company, profile, checklist, supplier matter, TXT sample agreement, local excerpt-based findings and versioned working draft in one click. Live browser QA verified the button and each seeded artifact. Two separate HTTP cookie sessions received different company IDs; repeating the action in one session reused its company; cross-session access to the first overview returned 404. The original manually created trial was not deleted. The live lawyer packet opened for the original trial. Mobile layout and a live model call are still unverified on this deployment.
 
 - **End-user account screens removed.** Opening the site creates an isolated guest identity and secure cookie session automatically. No sign-in or sign-out routes remain. Data remains tied to that browser session; clearing cookies or session expiry loses access because recovery is not implemented. This is acceptable for a private hackathon preview, not a production account model.
 - **M3/M4 usable path:** company profile and checklist lead to employment, supplier and other matters. Each matter keeps its own context, private TXT/DOCX/text-PDF files (10 MB, PDF page limit), extracted text, analyses, editable draft outlines, action items and printable lawyer packet. Uploads live in PostgreSQL bytea under tenant RLS. Deleting a document removes its linked analyses and matter drafts.

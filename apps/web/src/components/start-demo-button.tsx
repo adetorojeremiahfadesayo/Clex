@@ -19,8 +19,8 @@ export function StartDemoButton() {
     }
   }
   return <div>
-    <button type="button" disabled={pending} onClick={start} className="rounded-lg border border-white/50 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-60">
-      {pending ? "Preparing demo…" : "Try the ready-made demo →"}
+    <button type="button" disabled={pending} onClick={start} className="clex-demo-button">
+      {pending ? "Preparing your demo…" : "Explore the live demo →"}
     </button>
     {error && <p role="alert" className="mt-2 text-sm text-red-100">{error}</p>}
   </div>;
