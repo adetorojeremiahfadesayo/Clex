@@ -1,4 +1,4 @@
-/* Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V4 */
+/* Hallmark · statement-led split hero and living document scene · StudyMate and The Bridge studied DNA · editorial/atmospheric · evergreen and mint · pre-emit critique: P4 H5 E4 S5 R4 V4 */
 @import "tailwindcss";
 @import "./tokens.css";
 
@@ -29,17 +29,18 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-main { max-width: 76rem; margin-inline: auto; padding: clamp(1.2rem, 3vw, 2.5rem); }
 .clex-footer { max-width: 76rem; margin-inline: auto; padding: 1.5rem clamp(1rem, 4vw, 2.5rem) 2.5rem; border-top: 1px solid var(--color-rule); color: var(--color-ink-2); font-size: .75rem; line-height: 1.5; }
 
-.clex-hero { position: relative; isolation: isolate; overflow: hidden; min-height: 620px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); border-radius: 2rem; background: var(--color-forest-deep); color: var(--color-paper); padding: clamp(1.6rem, 5vw, 4.8rem); }
-.clex-hero::before { content: ""; position: absolute; inset: -35%; z-index: -1; background: radial-gradient(circle at 73% 43%, color-mix(in srgb, var(--color-mint) 18%, transparent), transparent 28%), radial-gradient(circle at 15% 92%, color-mix(in srgb, var(--color-coral) 12%, transparent), transparent 25%); animation: clex-ambient 18s ease-in-out infinite alternate; }
+.clex-hero { position: relative; isolation: isolate; overflow: hidden; min-height: 520px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); border-radius: 2rem; background: var(--color-forest-deep); color: var(--color-paper); padding: clamp(1.6rem, 4vw, 3.5rem); }
+.clex-hero::before { content: ""; position: absolute; inset: -35%; z-index: -1; background: radial-gradient(circle at 73% 43%, color-mix(in srgb, var(--color-mint) 18%, transparent), transparent 28%), radial-gradient(circle at 15% 92%, color-mix(in srgb, var(--color-coral) 12%, transparent), transparent 25%); }
 .clex-hero-copy { position: relative; z-index: 2; min-width: 0; animation: clex-enter var(--dur-medium) var(--ease-out) both; }
 .clex-hero-kicker { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid color-mix(in srgb, var(--color-mint) 45%, transparent); border-radius: var(--radius-pill); padding: .5rem .8rem; color: var(--color-mint); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .clex-hero-kicker::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--color-mint); }
-.clex-hero-title { max-width: 11ch; margin-top: var(--space-lg); font-family: var(--font-display); font-size: clamp(3.25rem, 6.3vw, 6.75rem); font-weight: 400; line-height: .98; letter-spacing: -.06em; overflow-wrap: anywhere; }
+.clex-hero-title { max-width: 14ch; margin-top: var(--space-lg); font-family: var(--font-display); font-size: clamp(2.9rem, 4.8vw, 4.8rem); font-weight: 400; line-height: .98; letter-spacing: -.06em; overflow-wrap: anywhere; }
 .clex-hero-title em { color: var(--color-mint); font-weight: 400; }
 .clex-hero-sub { max-width: 31rem; margin-top: var(--space-lg); color: color-mix(in srgb, var(--color-paper) 83%, transparent); font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.55; }
 .clex-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: var(--space-lg); }
 .clex-demo-button { min-height: 3.25rem; border-radius: var(--radius-pill); background: var(--color-mint); color: var(--color-forest-deep); padding: .8rem 1.35rem; font-size: .9rem; font-weight: 800; white-space: nowrap; transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out); }
-.clex-demo-button:hover { transform: translateY(-3px); box-shadow: 0 8px 0 color-mix(in srgb, var(--color-mint) 20%, transparent); }
+.clex-demo-button:hover { transform: translateY(-3px); }
+.clex-demo-button:active, .button-primary:active, .button-secondary:active { transform: translateY(1px); }
 .clex-demo-button:disabled { opacity: .7; }
 .clex-hero-secondary { min-height: 3.25rem; display: inline-flex; align-items: center; border: 1px solid color-mix(in srgb, var(--color-paper) 65%, transparent); border-radius: var(--radius-pill); padding: .8rem 1.25rem; font-size: .9rem; font-weight: 700; white-space: nowrap; }
 .clex-hero-proof { display: flex; flex-wrap: wrap; gap: .6rem 1.2rem; margin-top: var(--space-lg); color: color-mix(in srgb, var(--color-paper) 66%, transparent); font-size: .72rem; }
@@ -60,7 +61,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-scene-character { position: absolute; width: clamp(125px, 17vw, 210px); left: 1%; bottom: -3%; transform: rotate(-8deg); filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--color-forest-deep) 40%, transparent)); }
 
 .clex-section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.3rem; }
-.clex-section-title { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.08; }
+.clex-section-title { min-width: 0; font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.08; overflow-wrap: anywhere; }
 .clex-section-caption { max-width: 32rem; color: var(--color-ink-2); font-size: .9rem; line-height: 1.55; }
 .clex-journey { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-rule); }
 .clex-journey-step { min-width: 0; background: var(--color-surface); padding: clamp(1.1rem, 2.5vw, 2rem); }
@@ -89,7 +90,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-status-pill { display: inline-block; margin-top: .6rem; border: 1px solid var(--color-rule); border-radius: var(--radius-pill); padding: .4rem .75rem; color: var(--color-ink-2); font-size: .75rem; font-weight: 700; }
 
 @keyframes clex-enter { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes clex-ambient { to { transform: translate3d(-5%, -2%, 0) scale(1.1); } }
 @keyframes clex-orbit { to { transform: rotate(338deg); } }
 @keyframes clex-paper { to { transform: rotate(5deg) translateY(-10px); } }
 @keyframes clex-bob { to { transform: translateY(-8px); } }
