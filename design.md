@@ -4,7 +4,7 @@
 Editorial and approachable. The landing page has cinematic depth; the app remains calm and task-focused.
 
 ## Reference DNA
-- StudyMate: one obvious judge path, a helpful mascot, visible progress, and a warm surface against deep ink.
+- StudyMate: one obvious judge path, a helpful mascot, visible progress, and a warm surface against deep ink. Clexa is a distinct chick character with a barrister's wig and Clex colors; no StudyMate asset is shipped.
 - The Bridge: layered scenery and slow ambient motion. Clex uses an original document scene rather than its landscape or assets.
 
 ## Macrostructure
@@ -21,7 +21,7 @@ The implemented source of truth is `apps/web/src/app/tokens.css`. Warm paper, ev
 - Labels: body face, tracked uppercase.
 
 ## Motion
-The landing document scene enters once, then floats slowly; Clexa gives a small wave. No animation blocks navigation or implies a live AI response. `prefers-reduced-motion` disables ambient motion and shortens transitions.
+The landing document scene enters once, then floats slowly; Clexa bobs gently while waving in the illustration. No animation blocks navigation or implies a live AI response. `prefers-reduced-motion` disables ambient motion and shortens transitions.
 
 ## Product voice
 Clexa guides a founder through profile, checklist, matter, and lawyer packet. It does not impersonate a lawyer or claim legal review. Synthetic demo and local preparation are labelled where shown.

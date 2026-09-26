@@ -58,7 +58,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-scene-heading { margin-top: 1rem; font-family: var(--font-display); font-size: clamp(1.1rem, 2vw, 1.7rem); line-height: 1.1; }
 .clex-scene-highlight { margin-top: 1.2rem; border-left: 3px solid var(--color-coral); background: var(--color-paper); padding: .75rem; font-size: .78rem; line-height: 1.45; }
 .clex-scene-badge { position: absolute; right: 1%; bottom: 3%; max-width: 13rem; border-radius: 1rem; background: var(--color-mint); color: var(--color-forest-deep); padding: .85rem 1rem; font-size: .8rem; font-weight: 750; box-shadow: 0 15px 30px color-mix(in srgb, var(--color-forest-deep) 30%, transparent); animation: clex-bob 5s ease-in-out infinite alternate; }
-.clex-scene-character { position: absolute; width: clamp(125px, 13vw, 170px); left: -5%; bottom: 28%; transform: rotate(-8deg); filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--color-forest-deep) 40%, transparent)); }
+.clex-scene-character { position: absolute; width: clamp(125px, 13vw, 170px); height: auto; left: -5%; bottom: 28%; transform: rotate(-8deg); filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--color-forest-deep) 40%, transparent)); animation: clex-mascot-bob 5s ease-in-out infinite alternate; }
 
 .clex-section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.3rem; }
 .clex-section-title { min-width: 0; font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.08; overflow-wrap: anywhere; }
@@ -77,11 +77,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .clex-empty { border: 1px dashed var(--color-rule); border-radius: var(--radius-card); padding: var(--space-lg); color: var(--color-ink-2); }
 .clex-privacy { color: var(--color-ink-2); font-size: .75rem; line-height: 1.5; }
 
-.clexa-float { transform-origin: center; animation: clex-bob 5s ease-in-out infinite alternate; }
-.clexa-wave { transform-origin: 227px 182px; animation: clex-wave 4s ease-in-out infinite; }
-.clexa-eyes { transform-origin: center; animation: clex-blink 6s ease-in-out infinite; }
 .clexa-guide { display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.75rem); border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-mint-soft); padding: clamp(1rem, 2vw, 1.6rem); }
-.clexa-guide-art { width: 5.5rem; flex: none; align-self: end; }
+.clexa-guide-art { width: 5.5rem; height: auto; flex: none; align-self: end; }
 .clexa-guide-body { min-width: 0; flex: 1; }
 .clexa-guide h2 { font-family: var(--font-display); font-size: clamp(1.3rem, 2.2vw, 1.85rem); line-height: 1.1; }
 .clexa-guide p { max-width: 43rem; color: var(--color-ink-2); font-size: .86rem; line-height: 1.5; }
@@ -93,8 +90,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 @keyframes clex-orbit { to { transform: rotate(338deg); } }
 @keyframes clex-paper { to { transform: rotate(5deg) translateY(-10px); } }
 @keyframes clex-bob { to { transform: translateY(-8px); } }
-@keyframes clex-wave { 0%, 75%, 100% { transform: rotate(0); } 82% { transform: rotate(-12deg); } 91% { transform: rotate(8deg); } }
-@keyframes clex-blink { 0%, 46%, 50%, 100% { transform: scaleY(1); } 48% { transform: scaleY(.12); } }
+@keyframes clex-mascot-bob { to { transform: rotate(-8deg) translateY(-8px); } }
 
 @media (max-width: 800px) {
   .clex-hero { min-height: 0; grid-template-columns: minmax(0, 1fr); padding-bottom: 0; }
@@ -132,6 +128,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
   .clexa-guide-action .button-primary { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .clex-hero::before, .clex-hero-copy, .clex-scene-orbit, .clex-scene-sheet-front, .clex-scene-badge, .clexa-float, .clexa-wave, .clexa-eyes { animation: none !important; }
+  .clex-hero::before, .clex-hero-copy, .clex-scene-orbit, .clex-scene-sheet-front, .clex-scene-badge, .clex-scene-character { animation: none !important; }
   .button-primary, .button-secondary, .clex-demo-button, .clex-company-card { transition-duration: 100ms; }
 }
