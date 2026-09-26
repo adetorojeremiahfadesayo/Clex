@@ -3,50 +3,64 @@ import { createCompanyInputSchema, lifecycleStageLabels, lifecycleStages } from 
 import { createCompanyWithOwner } from "@lex/db";
 import { asActor } from "@/lib/db";
 import { currentUser } from "@/lib/session";
+import { demoCompany } from "@/lib/demo-answers";
+import { Clexa } from "@/components/clexa";
 
 async function createCompanyAction(formData: FormData) {
   "use server";
   const user = await currentUser();
   if (!user) redirect("/api/guest?next=/companies/new");
+  const demo = formData.get("demo") === "1";
   const parsed = createCompanyInputSchema.safeParse({
     name: formData.get("name"),
     lifecycleStage: formData.get("lifecycleStage"),
   });
-  if (!parsed.success) redirect("/companies/new?error=invalid");
+  if (!parsed.success) redirect(`/companies/new?error=invalid${demo ? "&demo=1" : ""}`);
   const company = await asActor(user.id, (db) => createCompanyWithOwner(db, parsed.data));
-  redirect(`/companies/${company.id}/overview`);
+  redirect(demo ? `/companies/${company.id}/profile?demo=1` : `/companies/${company.id}/overview`);
 }
 
-export default async function NewCompanyPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function NewCompanyPage({ searchParams }: { searchParams: Promise<{ error?: string; demo?: string }> }) {
   if (!(await currentUser())) redirect("/api/guest?next=/companies/new");
-  const { error } = await searchParams;
+  const { error, demo } = await searchParams;
+  const isDemo = demo === "1";
+  const defaultStage = isDemo ? demoCompany.lifecycleStage : lifecycleStages[0];
   return (
-    <section className="mx-auto max-w-lg space-y-6">
-      <h1 className="text-2xl font-semibold">Add a company</h1>
-      <p className="text-sm text-slate-600">
-        Start with the basics. You will confirm more facts progressively; nothing here is treated as legally verified.
-      </p>
-      <form action={createCompanyAction} className="space-y-4">
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Business or trading name</span>
-          <input name="name" required maxLength={200} className="w-full rounded border border-slate-300 px-3 py-2" />
+    <section className="clex-start">
+      <div className="clex-start-intro">
+        <p className="eyebrow">{isDemo ? "Demo answers" : "Try it out"}</p>
+        <h1 className="clex-page-title">{isDemo ? "Start the sample company" : "Add your company"}</h1>
+        <p className="clex-page-sub">
+          {isDemo
+            ? "We’ve filled in a synthetic bakery. Create it, then pick the demo answer on each question — or change any answer yourself."
+            : "Start with the basics. You will confirm more facts step by step; nothing here is treated as legally verified."}
+        </p>
+        <Clexa className="clex-start-art" decorative />
+      </div>
+      <form action={createCompanyAction} className="card clex-start-form">
+        {isDemo && <input type="hidden" name="demo" value="1" />}
+        <label className="block">
+          <span className="clex-field-label">Business or trading name</span>
+          <input name="name" required maxLength={200} defaultValue={isDemo ? demoCompany.name : undefined} className="field" />
         </label>
-        <fieldset className="space-y-2 text-sm">
-          <legend className="mb-1 font-medium">Where is the business today?</legend>
-          {lifecycleStages.map((stage, i) => (
-            <label key={stage} className="flex items-start gap-2 rounded border border-slate-200 bg-white p-3">
-              <input type="radio" name="lifecycleStage" value={stage} defaultChecked={i === 0} required className="mt-1" />
-              <span>{lifecycleStageLabels[stage]}</span>
-            </label>
-          ))}
+        <fieldset>
+          <legend className="clex-field-label">Where is the business today?</legend>
+          <div className="clex-stage-list">
+            {lifecycleStages.map((stage) => (
+              <label key={stage} className="clex-stage">
+                <input type="radio" name="lifecycleStage" value={stage} defaultChecked={stage === defaultStage} required />
+                <span>{lifecycleStageLabels[stage]}</span>
+              </label>
+            ))}
+          </div>
         </fieldset>
         {error && (
-          <p role="alert" className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          <p role="alert" className="clex-alert">
             Please provide a name and choose a stage.
           </p>
         )}
-        <button type="submit" className="rounded bg-[var(--accent)] px-4 py-2 font-medium text-white">
-          Create company
+        <button type="submit" className="button-primary w-full">
+          {isDemo ? "Create sample company →" : "Create company →"}
         </button>
       </form>
     </section>
