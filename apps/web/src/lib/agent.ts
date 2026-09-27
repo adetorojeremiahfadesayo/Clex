@@ -117,10 +117,10 @@ function draftLetter(matter: Matter, companyName: string, points: Finding[], mis
 
 const liveSchema = z.object({ reply: z.string().min(1).max(2000), findings: z.array(findingSchema).max(12), questions: z.array(z.string().min(1).max(500)).max(12), letter: z.string().max(12000).nullable() });
 
-export async function runAgent(input: { matter: Matter; facts: FactMap; docs: MatterDocument[]; companyName: string; message: string; config: ServerEnv }): Promise<AgentResult> {
+export async function runAgent(input: { matter: Matter; facts: FactMap; docs: MatterDocument[]; companyName: string; message: string; config: ServerEnv; allowExternalProcessing?: boolean }): Promise<AgentResult> {
   const wantLetter = /\b(draft|letter|write|email|reply|minutes|note)\b/i.test(input.message);
   const { config } = input;
-  if (config.LLM_PROVIDER === "none" || !config.LLM_API_KEY || !config.LLM_MODEL) return localAgent(input.matter, input.facts, input.docs, input.companyName, wantLetter);
+  if (!input.allowExternalProcessing || config.LLM_PROVIDER === "none" || !config.LLM_API_KEY || !config.LLM_MODEL) return localAgent(input.matter, input.facts, input.docs, input.companyName, wantLetter);
   const readable = input.docs.filter((d) => d.extractionStatus === "readable");
   const prompt = JSON.stringify({
     task: "Return JSON {reply, findings:[{kind,title,explanation,companyReason,documentExcerpt,sourceType,comparison}], questions, letter}. comparison is null unless two supplied sources state different terms; then include leftLabel, leftExcerpt, rightLabel, rightExcerpt using exact source substrings. reply: short plain answer to the user's message. letter: an editable draft only if the user asked for one, else null; start it with 'WORKING DRAFT — NOT REVIEWED BY A LAWYER'. Every excerpt must be an exact substring of a supplied source. Do not state legal rules, deadlines or enforceability.",
