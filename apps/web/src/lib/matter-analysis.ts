@@ -1,4 +1,4 @@
-import { answeredString, analysisOutputSchema, type FactMap, type Finding, type ServerEnv } from "@lex/domain";
+import { answeredString, analysisOutputSchema, intakeQuestions, marketLabels, type FactKey, type FactMap, type Finding, type ServerEnv } from "@lex/domain";
 import type { Matter, MatterDocument } from "@lex/db";
 
 function excerptFor(text:string, pattern:RegExp):string|null {
@@ -9,8 +9,24 @@ function excerptFor(text:string, pattern:RegExp):string|null {
   return text.slice(start,end).trim().slice(0,600);
 }
 export function profileDescription(facts:FactMap):string {
-  const parts=["formation_country","formation_subdivision","industry","activities","registration_status","employee_count","has_suppliers","customer_data"].map(k=>{const v=answeredString(facts,k as keyof FactMap);return v?`${k.replaceAll("_"," ")}: ${v}`:null;}).filter(Boolean);
-  return parts.join("; ") || "No confirmed company profile facts yet";
+  const value = (key: FactKey) => answeredString(facts, key);
+  const optionLabel = (key: FactKey, raw: string | undefined) => raw
+    ? intakeQuestions.find((question) => question.key === key)?.options?.find((option) => option.value === raw)?.label ?? raw
+    : undefined;
+  const placeCode = value("formation_country");
+  const place = placeCode && placeCode in marketLabels ? marketLabels[placeCode as keyof typeof marketLabels] : placeCode;
+  const subdivision = value("formation_subdivision");
+  const formation = place ? `The profile says the company is formed in ${place}${subdivision ? ` (${subdivision})` : ""}.` : null;
+  const industry = value("industry") ? `Its industry is ${value("industry")}.` : null;
+  const activities = value("activities") ? `It focuses on ${value("activities")}.` : null;
+  const status = ({ registered: "The profile says it is registered.", in_progress: "The profile says registration is in progress.", not_registered: "The profile says it is not registered yet." } as Record<string, string>)[value("registration_status") ?? ""];
+  const staff = value("employee_count");
+  const supplier = ({ yes: "The profile says it uses written supplier agreements.", no: "The profile says it does not use written supplier agreements." } as Record<string, string>)[value("has_suppliers") ?? ""];
+  const customerData = optionLabel("customer_data", value("customer_data"));
+  const employeeCount = staff ? `The profile records ${staff} employee${staff === "1" ? "" : "s"}.` : null;
+  const data = customerData ? `The profile says it holds ${customerData.toLowerCase()}.` : null;
+  const parts = [formation, industry, activities, status, employeeCount, supplier, data].filter(Boolean);
+  return parts.length ? parts.join(" ") : "No company details have been confirmed yet.";
 }
 
 /** Useful preparation when no reviewed legal pack or live model is available. */
@@ -24,36 +40,36 @@ export function prepareMatter(matter:Matter, facts:FactMap, document:MatterDocum
     if(!matter.context.workLocation) questions.push("Where will this person actually work? Employment rules may depend on that location.");
     if(!matter.context.role) questions.push("What role, duties and working arrangement are intended?");
     if(!matter.context.payment) questions.push("What pay, currency and payment schedule have been agreed?");
-    add("Define the work and relationship","Write down duties, reporting line, start date, work location and whether this is intended as employment or independent contracting. Ask a local adviser to check classification.",`This matter concerns ${matter.title}; company context: ${profileDescription(facts)}.`,"matter_context");
+    add("Define the work and relationship","Write down duties, reporting line, start date, work location and whether this is intended as employment or independent contracting. Ask a local adviser to check classification.",`This hiring decision affects the company’s planned work and team. ${profileDescription(facts)}`,"matter_context");
   } else if(matter.kind==="supplier") {
     if(!matter.context.deliverables) questions.push("What exactly will be supplied, by when, and how will acceptance be decided?");
     if(!matter.context.payment) questions.push("What payment milestones, currency and taxes have the parties agreed?");
     if(!matter.context.dataAccess) questions.push("Will the supplier handle personal data or confidential material?");
-    add("Describe the commercial deal","Record each party’s deliverables, acceptance criteria, price, timing and responsibility for changes before a lawyer reviews wording.",`The company is considering ${matter.title}; company context: ${profileDescription(facts)}.`,"matter_context");
+    add("Describe the commercial deal","Record each party’s deliverables, acceptance criteria, price, timing and responsibility for changes before a lawyer reviews wording.",`This supplier arrangement should fit the company’s operations. ${profileDescription(facts)}`,"matter_context");
   } else {
     if(!matter.context.question) questions.push("What decision or question should the lawyer address, and who has authority to decide it?");
-    add("Separate discussion from decision","For meeting notes, identify proposals, actual resolutions, responsible people and dates. A discussion alone does not establish a formal decision.",`Matter: ${matter.title}; company context: ${profileDescription(facts)}.`,"matter_context");
+    add("Separate discussion from decision","For meeting notes, identify proposals, actual resolutions, responsible people and dates. A discussion alone does not establish a formal decision.",`The company needs a clear record of what was proposed, decided, and assigned. ${profileDescription(facts)}`,"matter_context");
   }
   if(document?.extractionStatus==="readable") {
     const text=document.extractedText;
     const payment=excerptFor(text,/\b(payment|salary|fees|invoice|compensation)\b/i);
-    if(payment) add("Check payment wording","Compare this wording with the payment terms you intended. Record mismatches for legal review.",`Matter payment context: ${matter.context.payment||"not supplied"}.`,"document",payment);
+    if(payment) add("Check payment wording","Compare this wording with the payment terms you intended. Record mismatches for legal review.",matter.context.payment ? `The matter records these intended payment terms: ${matter.context.payment}. Compare them with the clause shown.` : "No payment schedule has been recorded for this matter yet. Confirm the intended amount, currency, and timing before comparing this clause.","document",payment);
     const termination=excerptFor(text,/\b(terminat(?:e|ion)|notice period|end of term)\b/i);
-    if(termination) add("Check exit wording","Confirm the exit process matches the commercial or hiring plan and ask counsel to review local requirements.",`Matter type: ${matter.kind}; company context: ${profileDescription(facts)}.`,"document",termination);
+    if(termination) add("Check exit wording","Confirm the exit process matches the commercial or hiring plan and ask counsel to review local requirements.",`The agreement includes exit wording. Compare it with the company’s intended working or supplier arrangement, then ask local counsel to review it. ${profileDescription(facts)}`,"document",termination);
     const law=excerptFor(text,/\b(governed by|governing law|jurisdiction|applicable law)\b/i);
-    if(law) add("Confirm governing law","Compare the document's governing-law wording with the actual places where the company and counterparty operate. Ask local counsel to check the consequences.",`Matter expectation: ${matter.context.governingLaw||"not confirmed"}; company context: ${profileDescription(facts)}.`,"document",law);
+    if(law) add("Confirm governing law","Compare the document's governing-law wording with the actual places where the company and counterparty operate. Ask local counsel to check the consequences.",matter.context.governingLaw ? `The matter records ${matter.context.governingLaw} as the expected governing law. Compare that with the clause and the parties’ locations.` : `No governing-law preference has been recorded for this matter. Compare the clause with where both parties operate and ask local counsel to explain the consequences. ${profileDescription(facts)}`,"document",law);
     if(matter.kind==="supplier") {
       const scope=excerptFor(text,/\b(scope of work|deliverables|services to be provided|acceptance criteria)\b/i);
-      if(scope) add("Match the promised work","Check that the written scope and acceptance process match what you asked the supplier to deliver.",`Intended deliverables: ${matter.context.deliverables||"not supplied"}.`,"document",scope);
+      if(scope) add("Match the promised work","Check that the written scope and acceptance process match what you asked the supplier to deliver.",matter.context.deliverables ? `The intended deliverables recorded for this matter are: ${matter.context.deliverables}. Compare them with this scope.` : "The matter does not yet record the intended deliverables. Confirm what the supplier must provide and how the company will accept the work.","document",scope);
       const liability=excerptFor(text,/\b(limitation of liability|indemnif(?:y|ication)|liability cap)\b/i);
-      if(liability) add("Review risk allocation","Identify whose losses this wording covers, any cap or exception, and the business exposure you are willing to accept. Have counsel assess the clause.",`Supplier relationship: ${matter.title}; company context: ${profileDescription(facts)}.`,"document",liability);
+      if(liability) add("Review risk allocation","Identify whose losses this wording covers, any cap or exception, and the business exposure you are willing to accept. Have counsel assess the clause.",`This clause allocates risk in a supplier relationship. Compare it with the company’s ability to absorb a loss and ask counsel to review it. ${profileDescription(facts)}`,"document",liability);
       const data=excerptFor(text,/\b(personal data|customer data|data protection|security measures|confidential information)\b/i);
-      if(data) add("Clarify data handling","Compare the document's data obligations with the access the supplier will actually have and prepare a question for a data-protection adviser.",`Supplier access: ${matter.context.dataAccess||"not confirmed"}; company customer data: ${answeredString(facts,"customer_data")||"not confirmed"}.`,"document",data);
+      if(data) add("Clarify data handling","Compare the document's data obligations with the access the supplier will actually have and prepare a question for a data-protection adviser.",matter.context.dataAccess ? `The matter says the supplier may access ${matter.context.dataAccess}. Compare that access with the clause and the customer information the company handles.` : `Supplier access to personal or confidential information has not been confirmed. Check what they can see before agreeing to these terms. ${profileDescription(facts)}`,"document",data);
       if(!scope) questions.push("No scope or acceptance wording was found in extracted text. Could it be in a statement of work or attachment?");
     }
     if(matter.kind==="employment") {
       const ip=excerptFor(text,/\b(intellectual property|work product|invention|copyright assignment)\b/i);
-      if(ip) add("Review work-product ownership","Compare the wording with what this person will create and the company's intended ownership. A lawyer should check the local treatment.",`Role: ${matter.context.role||"not supplied"}; company activity: ${answeredString(facts,"activities")||"not confirmed"}.`,"document",ip);
+      if(ip) add("Review work-product ownership","Compare the wording with what this person will create and the company's intended ownership. A lawyer should check the local treatment.",matter.context.role ? `This person is being considered for the ${matter.context.role} role. Compare the ownership wording with the work they will create and the company’s plans.` : `The role and expected work have not been recorded yet. Confirm them before asking counsel to review ownership of work product. ${profileDescription(facts)}`,"document",ip);
     }
     if(!payment) questions.push("No payment wording was found in the extracted text. Is it in an attachment or another document?");
     if(!termination) questions.push("No exit or termination wording was found in the extracted text. Is it in an attachment or another document?");

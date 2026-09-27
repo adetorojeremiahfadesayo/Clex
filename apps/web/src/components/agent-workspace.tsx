@@ -69,15 +69,19 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
     await addConversation(await file.text(), tab);
   }
   async function removeSource(id: string) {
+    setError(null);
     setBusy("Removing…");
-    try { await fetch(`${base}/documents/${id}`, { method: "DELETE" }); router.refresh(); } finally { setBusy(null); }
+    try { await json(`${base}/documents/${id}`, { method: "DELETE" }); router.refresh(); }
+    catch (e) { setError(e instanceof Error ? e.message : "Could not remove this source. Please try again."); }
+    finally { setBusy(null); }
   }
   async function ask(text: string) {
     const message = text.trim();
     if (!message) return;
     setError(null);
+    const retryingLastMessage = messages.at(-1)?.role === "user" && messages.at(-1)?.text === message;
     setInput("");
-    setMessages((m) => [...m, { role: "user", text: message }]);
+    if (!retryingLastMessage) setMessages((m) => [...m, { role: "user", text: message }]);
     setBusy("Reading your sources…");
     try {
       const data = await json(`${base}/agent`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ message, allowExternalProcessing: consent }) }) as { reply: string; mode: string; findings: Finding[]; questions: string[]; draft: { body: string; version: number } | null };
@@ -87,7 +91,9 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
       router.refresh();
       setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 50);
     } catch (e) {
-      setMessages((m) => [...m, { role: "agent", text: `Sorry, that didn't work: ${e instanceof Error ? e.message : "unknown error"}` }]);
+      const reason = e instanceof Error ? e.message : "an unexpected error occurred";
+      setInput(message);
+      setError(`Clex couldn’t finish that review: ${reason}. Your question is still here; check your connection and try again.`);
     } finally { setBusy(null); }
   }
   async function saveDraft() {
@@ -107,6 +113,13 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
     a.download = `${moduleTitle.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-draft-v${draftVersion || 1}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+  async function copyDraft() {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard access is unavailable.");
+      await navigator.clipboard.writeText(draftText);
+      setDraftNote("Copied to clipboard.");
+    } catch { setDraftNote("Clipboard access was blocked. Select and copy the draft text instead."); }
   }
 
   return (
@@ -215,7 +228,7 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
           <div className="clex-row mt-3">
             {canEdit && <button type="button" className="button-primary is-sm" disabled={!!busy || !draftText.trim()} onClick={() => void saveDraft()}>Save new version</button>}
             <button type="button" className="button-ghost is-sm" disabled={!draftText.trim()} onClick={downloadDraft}>Download .txt</button>
-            <button type="button" className="button-ghost is-sm" disabled={!draftText.trim()} onClick={() => void navigator.clipboard.writeText(draftText).then(() => setDraftNote("Copied."))}>Copy</button>
+            <button type="button" className="button-ghost is-sm" disabled={!draftText.trim()} onClick={() => void copyDraft()}>Copy</button>
             {draftNote && <span className="clex-fineprint">{draftNote}</span>}
           </div>
         </section>

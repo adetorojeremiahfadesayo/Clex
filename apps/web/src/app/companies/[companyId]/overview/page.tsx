@@ -47,7 +47,7 @@ export default async function WorkspacePage({ params, searchParams }: { params: 
         <div className="clex-ws-hero-copy">
           <p className="clex-chip-dark">Phase 1 · Registration</p>
           <h1 className="clex-ws-title">{company.name}</h1>
-          <JourneySteps companyId={companyId} step={step} q={q} />
+          <JourneySteps companyId={companyId} step={step} completed={[...(start.revision ? [1] : []), ...(prepDone ? [2] : [])]} q={q} />
         </div>
         <div className="clex-ws-guide">
           <p className="clex-bubble" role="status">{tip}</p>
