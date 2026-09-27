@@ -31,6 +31,8 @@ export default async function RegistrationPage({ params, searchParams }: { param
   const canEdit = (data.memberships.find((m) => m.userId === user.id && !m.revokedAt)?.role ?? "member") !== "reviewer";
   const prepDone = reg.tasks.slice(1, 5).every((t) => t.done);
   const packTask = reg.tasks.find((t) => t.id === "pack")!;
+  const certificateDone = reg.tasks.find((t) => t.id === "certificate")?.done ?? false;
+  const registrationComplete = packTask.done && certificateDone;
   const names = parseNames(answeredString(facts, "proposed_names"));
   const founders = parseFounders(answeredString(facts, "founder_details"));
 
@@ -41,7 +43,7 @@ export default async function RegistrationPage({ params, searchParams }: { param
         <div className="clex-ws-hero-copy">
           <p className="clex-chip-dark">Phase 1 · Registration</p>
           <h1 className="clex-ws-title">Pack &amp; certificate</h1>
-          <JourneySteps companyId={companyId} step={reg.registered ? 4 : 3} q={q} />
+          <JourneySteps companyId={companyId} step={registrationComplete ? 4 : 3} completed={[1, ...(prepDone ? [2] : []), ...(registrationComplete ? [3] : [])]} q={q} />
         </div>
       </header>
       <div className="clex-pack-grid">

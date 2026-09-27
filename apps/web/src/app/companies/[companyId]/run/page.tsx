@@ -54,7 +54,7 @@ export default async function CompliancePage({ params, searchParams }: { params:
         <div className="clex-ws-hero-copy">
           <p className="clex-chip-dark">Phase 2 · Compliance{reg.registered ? ` · Registered${regNumber ? ` ${regNumber}` : ""}` : ""}</p>
           <h1 className="clex-ws-title">Keep {company.name} on track</h1>
-          <JourneySteps companyId={companyId} step={4} q={q} />
+          <JourneySteps companyId={companyId} step={4} completed={[...(reg.start.revision ? [1] : []), ...(reg.tasks.slice(1, 5).every((task) => task.done) ? [2] : []), ...(reg.registered && reg.tasks.find((task) => task.id === "pack")?.done && reg.tasks.find((task) => task.id === "certificate")?.done ? [3] : [])]} q={q} />
         </div>
         <div className="clex-ws-guide">
           <p className="clex-bubble">{tip}</p>
