@@ -28,16 +28,17 @@ export function moduleViews(data: ModuleData[], checklist: ChecklistItem[]): Mod
     const analyses = mine.flatMap((d) => d.analyses).filter((a) => a.status !== "failed");
     const drafts = mine.flatMap((d) => d.drafts);
     const lastAnalysis = latest(analyses);
-    const lastDraft = latest(drafts);
+    const staleAnalysis = !!lastAnalysis && docs.some((document) => document.createdAt > lastAnalysis.createdAt);
     const done = {
       document: docs.some((d) => !isConversation(d)),
       conversation: docs.some(isConversation),
-      review: analyses.length > 0,
+      review: analyses.length > 0 && !staleAnalysis,
       draft: drafts.length > 0,
     };
     const tasks = m.tasks.map((t) => ({ label: t.label, done: done[t.kind] }));
     const open = lastAnalysis?.findings.filter((f: Finding) => f.kind !== "observation") ?? [];
-    const unresolved = !!lastAnalysis && open.length > 0 && (!lastDraft || lastDraft.createdAt < lastAnalysis.createdAt);
+    // A saved draft is a proposed response, not proof that the source issue is resolved.
+    const unresolved = !!lastAnalysis && open.length > 0;
     const doneCount = tasks.filter((t) => t.done).length;
     const status: ModuleStatus = unresolved ? "needs_attention" : doneCount === 0 ? "not_started" : doneCount === tasks.length ? "in_order" : "in_progress";
     const rule = checklist.find((i) => ruleModule[i.ruleId] === m.id && i.status !== "superseded" && i.status !== "dismissed_with_reason");
@@ -46,7 +47,7 @@ export function moduleViews(data: ModuleData[], checklist: ChecklistItem[]): Mod
       matterId: latest(mine.map((d) => d.matter))?.id ?? null,
       status,
       tasks,
-      attention: unresolved ? `${open.length} issue${open.length === 1 ? "" : "s"} found, e.g. “${open[0]!.title}”. Draft a response to resolve.` : null,
+      attention: unresolved ? staleAnalysis ? `The last check found ${open.length} issue${open.length === 1 ? "" : "s"}, including “${open[0]!.title}”, but a source changed afterward. Run the check again; a saved draft alone does not clear a finding.` : `${open.length} issue${open.length === 1 ? "" : "s"} remain, including “${open[0]!.title}”. A saved draft alone does not clear a finding; re-check the updated source to confirm.` : staleAnalysis ? "Your sources changed after the last check. Run the review again to refresh these findings." : null,
       recommended: rule ? findRule(rule.ruleId)?.action ?? null : null,
     };
   });

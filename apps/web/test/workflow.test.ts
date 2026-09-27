@@ -32,14 +32,15 @@ describe("compliance status", () => {
   const analysis = (at: string): MatterAnalysis => ({ id: "a", documentId: null, profileRevisionId: null, mode: "preparation", status: "needs_review", findings: [{ kind: "suggestion", title: "Clash", explanation: "e", companyReason: "r", documentExcerpt: "x", sourceType: "document" }], questions: [], errorMessage: null, provider: null, model: null, createdAt: at });
   const draft = (at: string): MatterDraft => ({ id: "d", version: 1, body: "b", status: "unreviewed", createdAt: at });
 
-  it("moves from not started to needs attention to in order", () => {
+  it("keeps open findings in needs attention until a later review clears them", () => {
     expect(moduleViews([], []).every((v) => v.status === "not_started")).toBe(true);
     const docs = [doc("conversation-slack-1.txt"), doc("contract.txt")];
     const attention = moduleViews([{ matter, documents: docs, analyses: [analysis("2026-01-02T00:00:00Z")], drafts: [] }], [])[0]!;
     expect(attention.status).toBe("needs_attention");
-    const resolved = moduleViews([{ matter, documents: docs, analyses: [analysis("2026-01-02T00:00:00Z")], drafts: [draft("2026-01-03T00:00:00Z")] }], []);
-    expect(resolved[0]!.status).toBe("in_order");
-    expect(complianceScore(resolved)).toBe(Math.round((4 / 28) * 100));
+    const withDraft = moduleViews([{ matter, documents: docs, analyses: [analysis("2026-01-02T00:00:00Z")], drafts: [draft("2026-01-03T00:00:00Z")] }], []);
+    expect(withDraft[0]!.status).toBe("needs_attention");
+    expect(withDraft[0]!.attention).toContain("A saved draft alone does not clear a finding");
+    expect(complianceScore(withDraft)).toBe(Math.round((4 / 28) * 100));
   });
 
   it("labels calendar dates as placeholders relative to registration", () => {

@@ -62,6 +62,7 @@ function localAgent(matter: Matter, facts: FactMap, docs: MatterDocument[], comp
     kind: "suggestion", title: `Conversation and document disagree: ${m.title.toLowerCase()}`,
     explanation: `Your ${m.source} conversation says “${unspeaker(m.convLine)}”. Ask for the document to be corrected, or confirm which is right before signing.`,
     companyReason: `The written term differs from what was agreed in ${m.source}.`, documentExcerpt: m.docLine, sourceType: "document",
+    comparison: { leftLabel: `${m.source} conversation`, leftExcerpt: unspeaker(m.convLine), rightLabel: "Agreement", rightExcerpt: m.docLine },
   }));
   const contractFindings: Finding[] = [];
   for (const d of contracts) {
@@ -122,7 +123,7 @@ export async function runAgent(input: { matter: Matter; facts: FactMap; docs: Ma
   if (config.LLM_PROVIDER === "none" || !config.LLM_API_KEY || !config.LLM_MODEL) return localAgent(input.matter, input.facts, input.docs, input.companyName, wantLetter);
   const readable = input.docs.filter((d) => d.extractionStatus === "readable");
   const prompt = JSON.stringify({
-    task: "Return JSON {reply, findings:[{kind,title,explanation,companyReason,documentExcerpt,sourceType}], questions, letter}. reply: short plain answer to the user's message. letter: an editable draft only if the user asked for one, else null; start it with 'WORKING DRAFT — NOT REVIEWED BY A LAWYER'. Excerpts must be exact substrings of the supplied sources. Do not state legal rules, deadlines or enforceability.",
+    task: "Return JSON {reply, findings:[{kind,title,explanation,companyReason,documentExcerpt,sourceType,comparison}], questions, letter}. comparison is null unless two supplied sources state different terms; then include leftLabel, leftExcerpt, rightLabel, rightExcerpt using exact source substrings. reply: short plain answer to the user's message. letter: an editable draft only if the user asked for one, else null; start it with 'WORKING DRAFT — NOT REVIEWED BY A LAWYER'. Every excerpt must be an exact substring of a supplied source. Do not state legal rules, deadlines or enforceability.",
     userMessage: input.message,
     company: input.companyName,
     companyProfile: profileDescription(input.facts),
@@ -133,6 +134,10 @@ export async function runAgent(input: { matter: Matter; facts: FactMap; docs: Ma
   const output = liveSchema.parse(JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, "").trim()));
   for (const f of output.findings) {
     if (f.documentExcerpt && !readable.some((d) => d.extractedText.includes(f.documentExcerpt!))) throw new Error("Model output quoted text that is not in your sources");
+    if (f.comparison) {
+      const excerpts = [f.comparison.leftExcerpt, f.comparison.rightExcerpt];
+      if (excerpts.some((excerpt) => !readable.some((d) => d.extractedText.includes(excerpt)))) throw new Error("Model output included a comparison that is not supported by the supplied sources");
+    }
   }
   return { mode: "live", ...output, sourceCount: readable.length };
 }
