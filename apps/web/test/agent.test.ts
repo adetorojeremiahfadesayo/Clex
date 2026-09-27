@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { parseServerEnv } from "@lex/domain";
 import type { Matter, MatterDocument } from "@lex/db";
 import { runAgent } from "../src/lib/agent";
@@ -36,6 +36,23 @@ describe("local agent", () => {
     expect(result.findings).toHaveLength(0);
     expect(result.letter).toBeNull();
     expect(result.sourceCount).toBe(0);
+  });
+
+  it("requests strict structured output for live OpenAI reviews", async () => {
+    const text = "Payment is due monthly in GBP.";
+    let requestBody: BodyInit | null | undefined;
+    const fetchMock = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
+      requestBody = init?.body;
+      return { ok: true, json: async () => ({ output: [{ content: [{ type: "output_text", text: JSON.stringify({ reply: "The payment clause needs confirmation.", findings: [{ kind: "suggestion", title: "Confirm payment timing", explanation: "Check that monthly billing matches the deal.", companyReason: "The agreement sets a monthly payment schedule.", documentExcerpt: text, comparison: null, sourceType: "document" }], questions: [], letter: null }) }] }] }) } as Response;
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const liveConfig = parseServerEnv({ NODE_ENV: "test", DATABASE_URL: "postgres://admin@test/db", APP_DATABASE_URL: "postgres://app@test/db", LLM_PROVIDER: "openai", LLM_MODEL: "test-model", LLM_API_KEY: "test-key" });
+    const result = await runAgent({ ...base, config: liveConfig, docs: [doc("supplier.txt", text)], message: "Review the payment terms" });
+    const body = JSON.parse(String(requestBody)) as { text: { format: { type: string; name: string; strict: boolean; schema: unknown } } };
+
+    expect(result.mode).toBe("live");
+    expect(body.text.format).toMatchObject({ type: "json_schema", name: "clex_agent_response", strict: true });
+    expect(body.text.format.schema).toMatchObject({ properties: { findings: { items: { properties: { kind: { enum: ["observation", "question", "suggestion"] } }, required: expect.arrayContaining(["comparison"]) } } } });
   });
 });
 
