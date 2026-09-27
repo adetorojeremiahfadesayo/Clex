@@ -169,8 +169,8 @@ export function IntakeForm({ companyId, currentVersion, facts, demoMode = false 
         <button type="button" className="button-ghost" disabled={stepIndex === 0} onClick={() => setStepIndex(Math.max(0, Math.min(stepIndex, reviewIndex) - 1))}>← Back</button>
         <span className="clex-wizard-count">{touched ? `${touched} answered` : "Nothing picked yet"}</span>
         {onReview
-          ? <button type="submit" disabled={pending || touched === 0} className="button-primary">{pending ? "Saving…" : "Save company answers →"}</button>
-          : <button type="button" className="button-primary" onClick={() => setStepIndex(stepIndex + 1)}>{stepIndex === reviewIndex - 1 ? "Review answers →" : "Next →"}</button>}
+          ? <button key="save" type="submit" disabled={pending || touched === 0} className="button-primary">{pending ? "Saving…" : "Save company answers →"}</button>
+          : <button key="advance" type="button" className="button-primary" onClick={(event) => { event.preventDefault(); setStepIndex(stepIndex + 1); }}>{stepIndex === reviewIndex - 1 ? "Review answers →" : "Next →"}</button>}
       </div>
       {!demoMode && <p className="clex-wizard-foot">Saving creates profile revision {currentVersion + 1}. <Link href="?demo=1&edit=1#profile" scroll={false} className="clex-link">Show demo answers</Link></p>}
     </form>
