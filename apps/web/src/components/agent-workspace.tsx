@@ -17,10 +17,10 @@ async function json(url: string, init: RequestInit) {
   return data;
 }
 
-export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample, sources, latest, draft, canEdit, modelReady, companyMemory, history }: {
+export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample, sources, latest, draft, canEdit, modelReady, demoMode, companyMemory, history }: {
   companyId: string; matterId: string; moduleTitle: string; asks: string[]; sample: ModuleSample | null;
   sources: Source[]; latest: { mode: string; findings: Finding[]; questions: string[] } | null;
-  draft: { body: string; version: number } | null; canEdit: boolean; modelReady: boolean;
+  draft: { body: string; version: number } | null; canEdit: boolean; modelReady: boolean; demoMode: boolean;
   companyMemory: { label: string; value: string }[];
   history: { id: string; role: "user" | "assistant"; body: string; findings: Finding[]; questions: string[]; mode: string | null; draftVersion: number | null }[];
 }) {
@@ -175,7 +175,7 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
           <div className="clex-chat-head">
             <span className="clex-agent-dot" aria-hidden="true" />
             <strong>Clex agent</strong>
-            <span className="clex-chat-mode">{modelReady ? "Model connected" : "Local rules · no model configured"}</span>
+            <span className="clex-chat-mode">{consent && modelReady ? "Live AI review selected" : demoMode ? "Instant demo review · AI optional" : modelReady ? "Instant local review · AI optional" : "Local rules · no model configured"}</span>
             {voice.canSpeak && <label className="clex-switch"><input type="checkbox" checked={readAloud} onChange={(e) => { setReadAloud(e.target.checked); if (!e.target.checked) voice.stopSpeaking(); }} /><span>Read replies aloud</span></label>}
           </div>
           <div className="clex-chat-log" aria-live="polite">
@@ -205,13 +205,13 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
           {canEdit && (
             <>
               <div className="clex-suggest">{asks.map((a) => <button key={a} type="button" onClick={() => void ask(a)} disabled={!!busy}>{a}</button>)}</div>
-              {modelReady && <label className="clex-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> Send my sources and company details to the configured model provider.</label>}
+              {modelReady && <label className="clex-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> Use live AI for this review. This sends my sources and company details to the model provider.</label>}
               <form className="clex-composer" onSubmit={(e) => { e.preventDefault(); void ask(input); }}>
                 {voice.canListen && <button type="button" className={`clex-mic ${voice.listening ? "is-on" : ""}`} onClick={voice.listen} aria-pressed={voice.listening} aria-label={voice.listening ? "Stop listening" : "Speak your question"}>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h2v-2.07A7 7 0 0 0 19 12h-2Z" fill="currentColor" /></svg>
                 </button>}
                 <input className="clex-composer-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={voice.listening ? "Listening…" : "Ask the agent, or say “draft a letter”"} maxLength={2000} />
-                <button type="submit" className="button-primary" disabled={!!busy || !input.trim() || (modelReady && !consent)}>Send</button>
+                <button type="submit" className="button-primary" disabled={!!busy || !input.trim()}>Send</button>
               </form>
               {voice.error && <p className="clex-fineprint">{voice.error}</p>}
             </>

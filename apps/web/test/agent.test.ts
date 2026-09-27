@@ -38,6 +38,17 @@ describe("local agent", () => {
     expect(result.sourceCount).toBe(0);
   });
 
+  it("keeps the instant review available when a model is configured but not selected", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const liveConfig = parseServerEnv({ NODE_ENV: "test", DATABASE_URL: "postgres://admin@test/db", APP_DATABASE_URL: "postgres://app@test/db", LLM_PROVIDER: "openai", LLM_MODEL: "test-model", LLM_API_KEY: "test-key" });
+    const docs = [doc("conversation-slack-1.txt", contracts.sample.conversation.text), doc("flour.txt", contracts.sample.document!.text)];
+    const result = await runAgent({ ...base, config: liveConfig, docs, message: "Does this match what we agreed?", allowExternalProcessing: false });
+    expect(result.mode).toBe("preparation");
+    expect(result.findings.map((finding) => finding.title)).toContain("Conversation and document disagree: payment terms");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("requests strict structured output for live OpenAI reviews", async () => {
     const text = "Payment is due monthly in GBP.";
     let requestBody: BodyInit | null | undefined;
@@ -47,7 +58,7 @@ describe("local agent", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
     const liveConfig = parseServerEnv({ NODE_ENV: "test", DATABASE_URL: "postgres://admin@test/db", APP_DATABASE_URL: "postgres://app@test/db", LLM_PROVIDER: "openai", LLM_MODEL: "test-model", LLM_API_KEY: "test-key" });
-    const result = await runAgent({ ...base, config: liveConfig, docs: [doc("supplier.txt", text)], message: "Review the payment terms" });
+    const result = await runAgent({ ...base, config: liveConfig, docs: [doc("supplier.txt", text)], message: "Review the payment terms", allowExternalProcessing: true });
     const body = JSON.parse(String(requestBody)) as { text: { format: { type: string; name: string; strict: boolean; schema: unknown } } };
 
     expect(result.mode).toBe("live");

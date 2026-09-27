@@ -78,6 +78,7 @@ export default async function MatterPage({ params, searchParams }: { params: Pro
         draft={latestDraft ? { body: latestDraft.body, version: latestDraft.version } : null}
         canEdit={role !== "reviewer"}
         modelReady={modelReady}
+        demoMode={demoMode}
         companyMemory={companyMemory}
         history={data.history.map(({id,role,body,findings,questions,mode,draftVersion})=>({id,role,body,findings,questions,mode,draftVersion}))}
       />

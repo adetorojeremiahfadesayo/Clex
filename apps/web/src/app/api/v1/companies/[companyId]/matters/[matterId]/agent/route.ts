@@ -19,8 +19,6 @@ export const POST = handle(async (request: Request, { params }: Context) => {
   if (company.role === "reviewer") throw new ApiError(403, "forbidden", "Reviewer cannot run the agent");
   const input = await parseBody(request, inputSchema);
   const config = env();
-  const live = config.LLM_PROVIDER !== "none" && !!config.LLM_API_KEY && !!config.LLM_MODEL;
-  if (live && !input.allowExternalProcessing) throw new ApiError(422, "consent_required", "Confirm sending your sources to the model provider first");
   const data = await asActor(user.id, async (db) => {
     const matter = await getMatter(db, companyId, matterId);
     if (!matter) throw new ApiError(404, "not_found", "Matter not found");
@@ -32,7 +30,7 @@ export const POST = handle(async (request: Request, { params }: Context) => {
   });
   let result: Awaited<ReturnType<typeof runAgent>>;
   try {
-    result = await runAgent({ matter: data.matter, facts: data.revision?.facts ?? {}, docs: data.docs, companyName: company.company.name, message: input.message, config });
+    result = await runAgent({ matter: data.matter, facts: data.revision?.facts ?? {}, docs: data.docs, companyName: company.company.name, message: input.message, config, allowExternalProcessing: input.allowExternalProcessing });
   } catch (error) {
     // No canned fallback: the user sees the failure and can retry.
     await asActor(user.id, (db) => createMatterChatMessage(db, { companyId, matterId, role: "assistant", body: `Sorry, that didn't work: ${error instanceof Error ? error.message.slice(0, 500) : "The agent failed. Try again."}`, actorId: user.id }));

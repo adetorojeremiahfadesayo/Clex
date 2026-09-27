@@ -10,7 +10,7 @@ Show how one company's saved answers shape its next steps and a later contract r
 2. On each company-question page, select **Fill this page with demo answers**, read the populated answers, then continue. Save the profile when prompted. Explain that unknowns stay unknown rather than being guessed.
 3. On registration-detail pages, fill and review each set of proposed names, founders, address and legal form before saving. Download the preparation pack if time permits. A demo certificate is clearly marked synthetic.
 4. In the company workspace, point out that registration is not marked complete until the pack and certificate steps are complete. Dashboard percentages describe tracked task progress, not a legal compliance score.
-5. Open **Contracts & suppliers**. Add the labelled sample conversation and sample agreement, then ask Clex whether they match. Point to the exact text from each source, the company-specific explanation, and the questions to take to counsel.
+5. Open **Contracts & suppliers**. Add the labelled sample conversation and sample agreement, then ask Clex whether they match. The instant local review is the default, even when a model is connected. Point to the exact text from each source, the company-specific explanation, and the questions to take to counsel. Tick **Use live AI for this review** only when demonstrating a consented model call.
 6. Ask Clex to draft a response. Show that the draft is editable and unreviewed. The finding stays open until a later source review supports clearing it. Adding a source makes the earlier analysis stale.
 
 ## Suggested narration
@@ -20,7 +20,7 @@ Show how one company's saved answers shape its next steps and a later contract r
 ## Be clear about the demo limits
 
 - This preview uses synthetic company and contract content.
-- If the header says **Local rules · no model configured**, analysis is local preparation logic. No live model call has been verified; describe the model adapter as implemented but unverified.
+- The default instant review is local preparation logic, labelled in the response. A live model call has been verified with synthetic sources; the optional checkbox sends the supplied sources and company details to the model provider for that review.
 - The selected market is not proof of reviewed legal coverage. Jurisdiction packs are draft research pointers, not approved legal content.
 - Calendar dates are planning placeholders, not filing deadlines.
 - Do not present generated drafts or findings as lawyer-reviewed advice.
