@@ -37,7 +37,7 @@ export default async function HomePage() {
           <button type="submit" className="button-secondary is-lg">Click demo answers</button>
         </form>
       </div>
-      <p className="clex-hero-hint">For judges: a 60-second walkthrough with a sample Lagos bakery. You pick the answers.</p>
+      <p className="clex-hero-hint">For judges: try a sample Lagos bakery. Fill and read one question page at a time.</p>
     </div>
 
     <div className="clex-showcase" aria-hidden="true">

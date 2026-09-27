@@ -37,7 +37,7 @@ export default async function WorkspacePage({ params, searchParams }: { params: 
   const prepDone = tasks.slice(1, 5).every((t) => t.done);
   const step = !start.revision ? 1 : !prepDone ? 2 : 3;
   const tip = !start.revision
-    ? demoMode ? "Tap “Pick all demo answers”, then save. About 20 seconds." : "Tell me about the business, one screen at a time. “Not sure” is a fine answer."
+    ? demoMode ? "Fill this page with demo answers, read them, then tap Next. Repeat for each page." : "Tell me about the business, one screen at a time. “Not sure” is a fine answer."
     : !prepDone ? "Now the registration details. Each step turns green when you save it." : "All details in. Download your registration pack for your lawyer.";
 
   return (
