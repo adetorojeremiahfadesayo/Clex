@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
 import { ApiError } from "./api";
 import { env } from "./env";
 
@@ -56,6 +55,10 @@ export async function extractUpload(file: File) {
     catch { throw new ApiError(422, "unreadable_document", "The DOCX could not be read; try exporting it again"); }
   } else if (lower.endsWith(".pdf") && bytes.subarray(0, 5).toString() === "%PDF-") {
     mimeType = "application/pdf";
+    // Load PDF tooling only for PDFs. Its canvas globals are unavailable when
+    // a Vercel function starts to process a TXT or DOCX upload.
+    await import("pdf-parse/worker");
+    const { PDFParse } = await import("pdf-parse");
     const parser = new PDFParse({ data: bytes });
     try {
       const info = await parser.getInfo();
