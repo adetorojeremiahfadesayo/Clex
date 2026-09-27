@@ -4,7 +4,7 @@
 
 Clex helps founders carry their company's context from the first registration question to the contracts on their desk. Confirm the facts, organize the next steps, and review business documents with the company's actual situation in view.
 
-**[Try the live demo](https://lex-company-counsel-web.vercel.app/)**  ·
+**[Try the live demo](https://lex-company-counsel.onrender.com/)**  ·
 ## **[ Demo Video](https://youtu.be/-aR-ZgzEj34)**
 
 ![Clex landing page, with Clexa guiding a founder through company preparation](docs/screenshots/clex-landing-desktop.png)
