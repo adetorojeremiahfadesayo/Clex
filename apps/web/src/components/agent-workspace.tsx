@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useRef, useState } from "react";
 import type { Finding } from "@lex/domain";
 import type { ModuleSample } from "@/lib/modules";
@@ -16,14 +17,16 @@ async function json(url: string, init: RequestInit) {
   return data;
 }
 
-export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample, sources, latest, draft, canEdit, modelReady }: {
+export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample, sources, latest, draft, canEdit, modelReady, companyMemory, history }: {
   companyId: string; matterId: string; moduleTitle: string; asks: string[]; sample: ModuleSample | null;
   sources: Source[]; latest: { mode: string; findings: Finding[]; questions: string[] } | null;
   draft: { body: string; version: number } | null; canEdit: boolean; modelReady: boolean;
+  companyMemory: { label: string; value: string }[];
+  history: { id: string; role: "user" | "assistant"; body: string; findings: Finding[]; questions: string[]; mode: string | null; draftVersion: number | null }[];
 }) {
   const router = useRouter();
   const base = `/api/v1/companies/${companyId}/matters/${matterId}`;
-  const [messages, setMessages] = useState<Message[]>(() => [
+  const [messages, setMessages] = useState<Message[]>(() => history.length ? history.map((m) => ({ role: m.role === "assistant" ? "agent" : "user", text: m.body, findings: m.findings, questions: m.questions, mode: m.mode ?? undefined, drafted: m.draftVersion ?? undefined })) : [
     { role: "agent", text: sources.length ? `I have ${sources.length} source${sources.length > 1 ? "s" : ""} for ${moduleTitle}. Ask me anything, or tap a suggestion.` : `Hi! I'm your ${moduleTitle} agent. Add a document or a Slack or Gmail conversation on the left, then ask me what to do.` },
     ...(latest ? [{ role: "agent" as const, text: "Here's what I found last time:", findings: latest.findings, questions: latest.questions, mode: latest.mode }] : []),
   ]);
@@ -109,6 +112,11 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
   return (
     <div className="clex-agent-grid">
       <aside className="clex-sources" aria-label="Sources">
+        <section className="clex-source-block" aria-label="Company memory">
+          <p className="eyebrow">What Clex knows</p>
+          {companyMemory.length ? <ul className="clex-memory-list">{companyMemory.map((fact) => <li key={fact.label}><span>{fact.label}</span><strong>{fact.value}</strong></li>)}</ul> : <p className="clex-fineprint">No confirmed company facts yet. Complete the company questions to tailor this review.</p>}
+          {canEdit && <Link className="clex-link is-sm" href={`/companies/${companyId}/overview?edit=1#profile`}>Update company facts ↗</Link>}
+        </section>
         <p className="eyebrow">Sources</p>
         <ul className="clex-source-list">
           {sources.map((s) => (
@@ -167,7 +175,8 @@ export function AgentWorkspace({ companyId, matterId, moduleTitle, asks, sample,
                       <li key={j} className={`is-${f.kind}`}>
                         <strong>{f.title}</strong>
                         <p>{f.explanation}</p>
-                        {f.documentExcerpt && <blockquote>“{f.documentExcerpt}”</blockquote>}
+                        {f.companyReason && <p className="clex-finding-reason"><strong>Why this applies:</strong> {f.companyReason}</p>}
+                        {f.comparison ? <div className="clex-evidence-comparison"><div><span>{f.comparison.leftLabel}</span><blockquote>“{f.comparison.leftExcerpt}”</blockquote></div><div><span>{f.comparison.rightLabel}</span><blockquote>“{f.comparison.rightExcerpt}”</blockquote></div></div> : f.documentExcerpt && <blockquote>“{f.documentExcerpt}”</blockquote>}
                       </li>
                     ))}
                   </ul>

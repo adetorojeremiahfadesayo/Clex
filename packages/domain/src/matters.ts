@@ -29,6 +29,12 @@ export const findingSchema = z.object({
   explanation: z.string().trim().min(1).max(1500),
   companyReason: z.string().trim().min(1).max(800),
   documentExcerpt: z.string().max(600).nullable(),
+  comparison: z.object({
+    leftLabel: z.string().trim().min(1).max(80),
+    leftExcerpt: z.string().trim().min(1).max(600),
+    rightLabel: z.string().trim().min(1).max(80),
+    rightExcerpt: z.string().trim().min(1).max(600),
+  }).nullable().optional(),
   sourceType: z.enum(["document", "company_profile", "matter_context"]),
 });
 export type Finding = z.infer<typeof findingSchema>;

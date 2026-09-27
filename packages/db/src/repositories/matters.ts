@@ -42,8 +42,12 @@ export async function getMatterDocument(db: Queryable, companyId:string, documen
 export async function deleteMatterDocument(db: Queryable, companyId:string, documentId:string): Promise<boolean> {
   const document=await getMatterDocument(db,companyId,documentId);
   if(!document)return false;
-  await db.query(`delete from matter_analyses where company_id=$1 and document_id=$2`,[companyId,documentId]);
+  // An analysis can depend on several files even though it stores one primary document id.
+  // Remove every derived result when any source is removed, so deleted conversation text
+  // cannot survive in findings, drafts, or saved chat turns.
+  await db.query(`delete from matter_analyses where company_id=$1 and matter_id=$2`,[companyId,document.matterId]);
   await db.query(`delete from matter_drafts where company_id=$1 and matter_id=$2`,[companyId,document.matterId]);
+  await db.query(`delete from matter_chat_messages where company_id=$1 and matter_id=$2`,[companyId,document.matterId]);
   const { rowCount } = await db.query(`delete from matter_documents where company_id=$1 and id=$2`,[companyId,documentId]);
   return (rowCount ?? 0) > 0;
 }
@@ -58,6 +62,20 @@ export async function createMatterAnalysis(db:Queryable,input:{companyId:string;
 export async function listMatterAnalyses(db:Queryable,companyId:string,matterId:string):Promise<MatterAnalysis[]> {
   const { rows }=await db.query<AnalysisRow>(`select id,document_id,profile_revision_id,mode,status,findings,questions,error_message,provider,model,created_at from matter_analyses where company_id=$1 and matter_id=$2 order by created_at desc`,[companyId,matterId]);
   return rows.map(toAnalysis);
+}
+
+export interface MatterChatMessage { id:string; role:"user"|"assistant"; body:string; findings:Finding[]; questions:string[]; mode:"preparation"|"live"|null; draftVersion:number|null; createdAt:string }
+interface ChatMessageRow { id:string; role:MatterChatMessage["role"]; body:string; findings:unknown; questions:unknown; mode:MatterChatMessage["mode"]; draft_version:number|null; created_at:Date }
+const toChatMessage=(r:ChatMessageRow):MatterChatMessage=>({id:r.id,role:r.role,body:r.body,...analysisOutputSchema.parse({findings:r.findings,questions:r.questions}),mode:r.mode,draftVersion:r.draft_version,createdAt:r.created_at.toISOString()});
+export async function createMatterChatMessage(db:Queryable,input:{companyId:string;matterId:string;role:MatterChatMessage["role"];body:string;findings?:Finding[]|undefined;questions?:string[]|undefined;mode?:MatterChatMessage["mode"]|undefined;draftVersion?:number|null|undefined;actorId:string}):Promise<MatterChatMessage>{
+  const body=input.body.trim().slice(0,4000);
+  if(!body)throw new Error("Chat message cannot be empty");
+  const {rows}=await db.query<ChatMessageRow>(`insert into matter_chat_messages(company_id,matter_id,role,body,findings,questions,mode,draft_version,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id,role,body,findings,questions,mode,draft_version,created_at`,[input.companyId,input.matterId,input.role,body,JSON.stringify(input.findings??[]),JSON.stringify(input.questions??[]),input.mode??null,input.draftVersion??null,input.actorId]);
+  return toChatMessage(rows[0]!);
+}
+export async function listMatterChatMessages(db:Queryable,companyId:string,matterId:string):Promise<MatterChatMessage[]>{
+  const {rows}=await db.query<ChatMessageRow>(`select id,role,body,findings,questions,mode,draft_version,created_at from (select id,role,body,findings,questions,mode,draft_version,created_at from matter_chat_messages where company_id=$1 and matter_id=$2 order by created_at desc,id desc limit 80) recent order by created_at,id`,[companyId,matterId]);
+  return rows.map(toChatMessage);
 }
 
 export interface MatterDraft { id:string; version:number; body:string; status:"unreviewed"|"review_requested"; createdAt:string }

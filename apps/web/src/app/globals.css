@@ -282,6 +282,10 @@ button:not(:disabled) { cursor: pointer; }
 .clex-x { width: 1.5rem; height: 1.5rem; border-radius: .4rem; color: var(--color-ink-2); font-size: 1.1rem; line-height: 1; }
 .clex-x:hover { background: var(--color-paper-2); color: var(--color-ink); }
 .clex-source-block { display: grid; gap: .5rem; border-top: 1px solid var(--color-rule); padding-top: 1rem; }
+.clex-memory-list { display: grid; gap: .4rem; }
+.clex-memory-list li { display: grid; gap: .12rem; border-radius: .55rem; background: var(--color-white); padding: .5rem .6rem; font-size: .78rem; }
+.clex-memory-list li span { color: var(--color-ink-2); }
+.clex-memory-list li strong { color: var(--color-ink); font-weight: 600; }
 .clex-tabs { display: inline-flex; justify-self: start; gap: .2rem; border-radius: .6rem; background: #eaeae7; padding: .2rem; }
 .clex-tabs button { border-radius: .45rem; padding: .3rem .8rem; color: var(--color-ink-2); font-size: .8rem; font-weight: 600; }
 .clex-tabs button[aria-selected="true"] { background: var(--color-white); color: var(--color-ink); box-shadow: var(--shadow-sm); }
@@ -311,6 +315,12 @@ button:not(:disabled) { cursor: pointer; }
 .clex-findings li.is-suggestion { border-left-color: var(--color-gold); }
 .clex-findings li strong { color: var(--color-white); }
 .clex-findings p { margin-top: .2rem; color: #b5b7bc; }
+.clex-findings .clex-finding-reason { margin-top: .55rem; border-radius: .45rem; background: rgb(34 192 122 / .08); padding: .45rem .55rem; color: #d4e9dd; }
+.clex-finding-reason strong { color: var(--color-mint); }
+.clex-evidence-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; margin-top: .55rem; }
+.clex-evidence-comparison > div { min-width: 0; border: 1px solid #383a40; border-radius: .5rem; background: #1b1c20; padding: .5rem; }
+.clex-evidence-comparison > div > span { color: #a7a9af; font-size: .7rem; font-weight: 650; text-transform: uppercase; letter-spacing: .04em; }
+.clex-findings .clex-evidence-comparison blockquote { overflow-wrap: anywhere; margin-top: .3rem; }
 .clex-findings blockquote { margin-top: .4rem; border-radius: .4rem; background: #2c2d32; padding: .35rem .55rem; color: #e3e3e6; font-family: var(--font-mono); font-size: .76rem; }
 .clex-questions-box { margin-top: .7rem; border-radius: .7rem; background: rgb(61 220 151 / .08); padding: .7rem .85rem; }
 .clex-questions-box .eyebrow { color: var(--color-mint); }
@@ -402,6 +412,7 @@ a.clex-side-title:hover, button.clex-side-title:not(:disabled):hover { color: va
   .clex-section-head { align-items: start; flex-direction: column; }
 }
 @media (max-width: 600px) {
+  .clex-evidence-comparison { grid-template-columns: minmax(0, 1fr); }
   .clex-nav-links > a:not(.clex-nav-demo) { display: none; }
   .clex-hero-actions, .clex-hero-actions form, .clex-hero-actions .is-lg { width: 100%; }
   .clex-journey { grid-template-columns: minmax(0, 1fr); }

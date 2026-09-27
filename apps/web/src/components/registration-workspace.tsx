@@ -41,6 +41,11 @@ export function RegistrationWorkspace({ companyId, version, tasks, initial, demo
       setError(((await res.json().catch(() => null)) as { error?: { message?: string } } | null)?.error?.message ?? "Could not save");
       return;
     }
+    if (!current.done) {
+      const order: RegistrationTaskId[] = ["names", "founders", "address", "legal_form", "pack", "certificate"];
+      const next = order.slice(Math.max(0, order.indexOf(active) + 1)).map((id) => tasks.find((task) => task.id === id)).find((task) => task && !task.done && !task.locked);
+      if (next) setActive(next.id);
+    }
     router.refresh();
   }
   const a = (value: string): Answer => ({ state: "answered", value });
@@ -56,23 +61,15 @@ export function RegistrationWorkspace({ companyId, version, tasks, initial, demo
     if (id === "address") setAddress(demoRegistration.address);
     if (id === "legal_form") setLegalForm(demoRegistration.legalForm);
   }
-  async function saveAllDemo() {
-    await save({
-      proposed_names: a(demoRegistration.names.join("; ")),
-      founder_details: a(serializeFounders(demoRegistration.founders)),
-      registered_address: a(demoRegistration.address),
-      legal_form: a(demoRegistration.legalForm),
-    }, "Registration details (demo answers)");
-  }
   const shares = founders.reduce((s, f) => s + (Number(f.share) || 0), 0);
 
   return (
     <div className="clex-ws-grid">
       <div className="clex-stack">
-        {demoMode && canEdit && tasks.slice(1, 5).some((t) => !t.done) && (
+        {demoMode && canEdit && payload[active] && !current.done && (
           <div className="clex-demo-banner">
-            <div><strong>Demo answers are on</strong><p>Each form has a “Use demo answer” tag. Or fill and save all four at once.</p></div>
-            <button type="button" className="button-primary" disabled={busy} onClick={() => void saveAllDemo()}>{busy ? "Saving…" : "Fill all demo details →"}</button>
+            <div><strong>Demo answers are on</strong><p>Fill only this page, read or edit the details, then save to continue.</p></div>
+            <button type="button" className="button-primary" disabled={busy} onClick={() => fillDemo(active)}>Fill this page with demo details</button>
           </div>
         )}
         <section className="clex-panel is-current" aria-live="polite">
@@ -140,7 +137,7 @@ export function RegistrationWorkspace({ companyId, version, tasks, initial, demo
           {error && <p role="alert" className="clex-alert mt-3">{error}</p>}
           {canEdit && payload[active] && (
             <div className="clex-wizard-nav mt-4">
-              {demoMode ? <button type="button" className="clex-demo-chip" onClick={() => fillDemo(active)}><span className="clex-demo-chip-tag">Demo</span>Use demo answer</button> : <span />}
+              <span />
               <button type="button" className="button-primary" disabled={busy || !payload[active]!()} onClick={() => { const p = payload[active]!(); if (p) void save(p, `Registration: ${current.title}`); }}>{busy ? "Saving…" : current.done ? "Update" : "Save and continue →"}</button>
             </div>
           )}

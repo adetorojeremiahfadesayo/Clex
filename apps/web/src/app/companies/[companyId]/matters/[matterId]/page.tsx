@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getMatter, listMatterAnalyses, listMatterDocuments, listMatterDrafts } from "@lex/db";
-import { uuidSchema } from "@lex/domain";
+import { getCurrentRevision, getMatter, listMatterAnalyses, listMatterChatMessages, listMatterDocuments, listMatterDrafts } from "@lex/db";
+import { answeredString, type FactKey, intakeQuestions, uuidSchema } from "@lex/domain";
 import { AgentWorkspace } from "@/components/agent-workspace";
 import { isConversation, conversationSource } from "@/lib/agent";
 import { resolveCompanyForActor } from "@/lib/authz";
@@ -23,7 +23,11 @@ export default async function MatterPage({ params, searchParams }: { params: Pro
   const data = await asActor(user.id, async (db) => {
     const matter = await getMatter(db, companyId, matterId);
     if (!matter) return null;
-    return { matter, documents: await listMatterDocuments(db, companyId, matterId), drafts: await listMatterDrafts(db, companyId, matterId), analyses: await listMatterAnalyses(db, companyId, matterId) };
+    const [revision, documents, drafts, analyses, history] = await Promise.all([
+      getCurrentRevision(db, companyId), listMatterDocuments(db, companyId, matterId), listMatterDrafts(db, companyId, matterId),
+      listMatterAnalyses(db, companyId, matterId), listMatterChatMessages(db, companyId, matterId),
+    ]);
+    return { matter, revision, documents, drafts, analyses, history };
   });
   if (!data) notFound();
   const { matter } = data;
@@ -35,6 +39,13 @@ export default async function MatterPage({ params, searchParams }: { params: Pro
   const q = demoMode ? "?demo=1" : "";
   const view = mod ? moduleViews([{ matter, documents: data.documents, analyses: data.analyses, drafts: data.drafts }], []).find((v) => v.module.id === mod.id) : undefined;
   const sources = data.documents.map((d) => ({ id: d.id, name: d.filename, readable: d.extractionStatus === "readable", type: isConversation(d) ? conversationSource(d) : "Document" }));
+  const memoryFields: [FactKey, string][] = [["formation_country","Formation country"],["formation_subdivision","Region"],["operating_locations","Operating locations"],["industry","Industry"],["activities","Business activity"],["registration_status","Registration status"],["hiring_plan","Hiring plan"],["has_suppliers","Suppliers"],["customer_data","Customer data"]];
+  const companyMemory = memoryFields.flatMap(([key,label]) => {
+    const raw=answeredString(data.revision?.facts ?? {},key);
+    if(!raw)return [];
+    const value=intakeQuestions.find((question)=>question.key===key)?.options?.find((option)=>option.value===raw)?.label ?? raw;
+    return [{label,value}];
+  });
 
   return (
     <section className="clex-page">
@@ -67,6 +78,8 @@ export default async function MatterPage({ params, searchParams }: { params: Pro
         draft={latestDraft ? { body: latestDraft.body, version: latestDraft.version } : null}
         canEdit={role !== "reviewer"}
         modelReady={modelReady}
+        companyMemory={companyMemory}
+        history={data.history.map(({id,role,body,findings,questions,mode,draftVersion})=>({id,role,body,findings,questions,mode,draftVersion}))}
       />
     </section>
   );
