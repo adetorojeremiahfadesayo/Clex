@@ -6,7 +6,7 @@ Show how one company's saved answers shape its next steps and a later contract r
 
 ## Live demo path
 
-1. Open the [Render preview](https://lex-company-counsel.onrender.com/) and select **Click demo answers**. This creates or reuses a synthetic company in the current browser session; existing demo workspaces remain available.
+1. Open the [Vercel preview](https://lex-company-counsel-web.vercel.app/) and select **Click demo answers**. This creates or reuses a synthetic company in the current browser session; existing demo workspaces remain available on their original hostname.
 2. On each company-question page, select **Fill this page with demo answers**, read the populated answers, then continue. Save the profile when prompted. Explain that unknowns stay unknown rather than being guessed.
 3. On registration-detail pages, fill and review each set of proposed names, founders, address and legal form before saving. Download the preparation pack if time permits. A demo certificate is clearly marked synthetic.
 4. In the company workspace, point out that registration is not marked complete until the pack and certificate steps are complete. Dashboard percentages describe tracked task progress, not a legal compliance score.
@@ -32,4 +32,4 @@ Show how one company's saved answers shape its next steps and a later contract r
 - Show the company context, exact evidence comparison, open-review state and draft boundary.
 - Keep the video within the event's current time limit and test the hosted video in a signed-out browser.
 - Disclose the actual stack and AI tools used, and state whether a live provider was configured for the recorded run.
-- Check the [live preview](https://lex-company-counsel.onrender.com/) immediately before sharing it.
+- Check the [live preview](https://lex-company-counsel-web.vercel.app/) immediately before sharing it.
